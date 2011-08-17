@@ -1,0 +1,71 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+  background-color: black;
+  font-family: sans-serif;
+  overflow: hidden;
+  color: #fff;
+}
+a {
+ color: #fff;
+}
+#info {
+    font-size: small;
+    position: absolute;
+  	top: 0px; width: 100%;
+  	padding: 5px;
+  	text-align: center;
+  	z-index: 2;
+}
+CANVAS {
+  background-color: gray;
+}
+.fpsContainer {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  color: gray;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 10px;
+  padding: 10px;
+}
+.fps {
+  color: white;
+}
+#uiContainer {
+  z-index: 3;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  width: 250px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  font-size: xx-small;
+  border-radius: 10px;
+  padding: 10px;
+}
+#ui {
+}
+.clickable {
+  cursor: pointer;
+}
+#viewContainer {
+  width: 100%;
+  height: 100%;
+}
+#msgContainer {
+  z-index: 10;
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  font-size: xx-small;
+  border-radius: 10px;
+  padding: 10px;
+}
+
