@@ -52,134 +52,6 @@ function LogGLCall(functionName, args) {
   }
 }
 
-// A target is something the player can shoot.
-function Target(blackboard) {
-  this.blackboard = blackboard;
-  this.position = new Float32Array(3);
-  this.radius = 1;
-}
-
-tdl.base.inherit(CirclePathFollower, GameComponent);
-
-/**
- * Calculate the intersection of a ray and a sphere
- *
- * point1 + mu1 (point2 - point1)
- * point1 + mu2 (point2 - point1)
- *
- * Return undefined.
- */
-var raySphereIntersection = function (point1, point2, center, radius) {
-  var kEpsilon = 0.0001;
-  var dp = [
-      point2[0] - point1[0],
-      point2[1] - point1[1],
-      point2[2] - point1[2]];
-  var a = dp[0] * dp[0] +
-          dp[1] * dp[1] +
-          dp[2] * dp[2];
-  var b = 2 * (dp[0] * (point1[0] - center[0]) +
-               dp[1] * (point1[1] - center[1]) +
-               dp[2] * (point1[2] - center[2]));
-  var c = center[0] * center[0] +
-          center[1] * center[1] +
-          center[2] * center[2];
-  c += point1[0] * point1[0] +
-       point1[1] * point1[1] +
-       point1[2] * point1[2];
-  c -= 2 * (center[0] * point1[0] +
-            center[1] * point1[1] +
-            center[2] * point1[2]);
-  c -= radius * radius;
-  var bb4ac = b * b - 4 * a * c;
-  if (Math.abs(a) < kEpsilon || bb4ac < 0) {
-    return;
-  }
-
-  var sq = Math.sqrt(bb4ac);
-  var mu1 = (-b + sq) / (2 * a);
-  var mu2 = (-b - sq) / (2 * a);
-
-  var m = Math.max(mu1, mu2);
-  return math.addVector(point1, math.mulScalarVector(m, dp));
-};
-
-/**
- * Checks if ray collides with target.
- * @param {!Ray} ray Ray to check with.
- * @return {boolean}
- */
-Target.prototype.collide = function(ray) {
-  return intersectRaySphere(ray, this.position, this.radius) >= 0.0;
-};
-
-/**
- * Checks when the mouse is over it.
- * @constructor
- * @param gameObj
- */
-function MouseTarget(gameObj) {
-  GameComponent.call(this, gameObj);
-  g_game.sys['aiManager'].addComponent(this);
-  this.inputManager = g_game.sys['inputManager'];
-  this.renderer = g_game.sys['renderer'];
-  gameObj.addPublicProperties({
-    world: new Float32Array(16),
-    lightColor: new Float32Array([1, 1, 1, 1])
-  });
-
-  this.red = new Float32Array([1, 0, 0, 1]);
-  this.gray = new Float32Array([1, 1, 1, 1]);
-}
-
-tdl.base.inherit(MouseTarget, GameComponent);
-
-var clientPositionToWorldRay = function(
-    clientXPosition,
-    clientYPosition,
-    clientWidth,
-    clientHeight,
-    viewProjectionInverse) {
-  // normScreenX, normScreenY are in frustum coordinates.
-  var normScreenX = clientXPosition / (clientWidth * 0.5) - 1;
-  var normScreenY = -(clientYPosition / (clientHeight * 0.5) - 1);
-
-  var matrix = viewProjectionInverse;
-
-  // Apply inverse view-projection matrix to get the ray in world coordinates.
-  return {
-      near: math.matrix4.transformPoint(
-          matrix, [normScreenX, normScreenY, 0]),
-      far: math.matrix4.transformPoint(
-          matrix, [normScreenX, normScreenY, 1])
-  };
-};
-
-MouseTarget.prototype.process = function(elapsedTime) {
-  var inputManager = this.inputManager;
-  var canvas = this.renderer.canvas;
-  var pp = this.gameObj.publicProperties;
-
-  // TODO(gman): Optimization. This ray is the same for all MouseTarget
-  // objects.
-  var ray = clientPositionToWorldRay(
-      inputManager.mouseX,
-      inputManager.mouseY,
-      canvas.clientWidth,
-      canvas.clientHeight,
-      this.renderer.getViewProjectionInverse());
-  var near = raySphereIntersection(
-      ray.near, ray.far,
-      [pp.world[12], pp.world[13], pp.world[14]],
-      1);
-  pp.lightColor.set(near ? this.red : this.gray);
-};
-
-Player = function() {
-  renderer.createMeshRendererComponent(this);
-  physics.createPhyicsComponent(this);
-}
-
 /**
  * Follows a cirucular path.
  * @constructor
@@ -242,12 +114,12 @@ function initialize() {
 
       { time:  8, type: createCirclePathEnemy },
       { time:  9, type: createCirclePathEnemy },
-      { time:  10, type: createCirclePathEnemy },
-      { time:  11, type: createCirclePathEnemy },
-      { time:  12, type: createCirclePathEnemy },
-      { time:  13, type: createCirclePathEnemy },
-      { time:  14, type: createCirclePathEnemy },
-      { time:  15, type: createCirclePathEnemy },
+      { time: 10, type: createCirclePathEnemy },
+      { time: 11, type: createCirclePathEnemy },
+      { time: 12, type: createCirclePathEnemy },
+      { time: 13, type: createCirclePathEnemy },
+      { time: 14, type: createCirclePathEnemy },
+      { time: 15, type: createCirclePathEnemy },
     ]
   };
 

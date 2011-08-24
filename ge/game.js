@@ -79,9 +79,13 @@ Game.prototype.tick = function() {
 };
 
 Game.prototype.process = function(elapsedTime) {
-  var numSystems = this.systems.length;
+  var systems = this.systems;
+  var numSystems = systems.length;
   for (var ii = 0; ii < numSystems; ++ii) {
-    this.systems[ii].process(elapsedTime);
+    var system = systems[ii];
+    if (system.process) {
+      system.process(elapsedTime);
+    }
   }
 
   var numToRemove = this.objectsToRemove.length;
