@@ -40,7 +40,6 @@ tdl.require('tdl.fast');
 tdl.require('tdl.math');
 tdl.require('tdl.webgl');
 
-tdl.require('ge.modelrenderer');
 tdl.require('ge.gamesystem');
 
 /**
@@ -109,10 +108,8 @@ ge.renderer = ge.renderer || {};
 
   tdl.base.inherit(Renderer, GameSystem);
 
-  Renderer.prototype.createModelRenderer = function(gameObject, model) {
-    var component = new ModelRenderer(gameObject, model);
-    gameObject.addComponent('modelRenderer', component);
-    this.addComponent(component);
+  Renderer.prototype.getViewProjectionInverse = function() {
+    return viewProjectionInverse;
   };
 
   Renderer.prototype.drawPrep = function(model) {
@@ -143,7 +140,7 @@ ge.renderer = ge.renderer || {};
 
     gl.colorMask(true, true, true, true);
     gl.depthMask(true);
-    gl.clearColor(0,0,Math.random() * 0.3,0);
+    gl.clearColor(1, 1, 1, 1);
     gl.clearDepth(1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 

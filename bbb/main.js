@@ -19,6 +19,7 @@ tdl.require('ge.modelrenderer');
 tdl.require('ge.enemylauncher');
 tdl.require('ge.fpscounter');
 tdl.require('ge.aimanager');
+tdl.require('ge.inputmanager');
 
 tdl.require('bbb.boombambeat');
 

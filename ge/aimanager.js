@@ -62,11 +62,6 @@ AIManager.prototype.process = function(elapsedTime) {
   GameSystem.prototype.process.call(this, elapsedTime);
 };
 
-AIManager.prototype.createCirclePathFollower = function(gameObj) {
-  var component = new CirclePathFollower(gameObj);
-  gameObj.addComponent('circlePathFollower', component);
-  this.addComponent(component);
-};
 
 
 

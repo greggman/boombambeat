@@ -37,6 +37,7 @@
 tdl.provide('ge.modelrenderer');
 
 tdl.require('ge.gamecomponent');
+tdl.require('ge.renderer');
 
 /**
  * A module for ModelRenderr.
@@ -48,13 +49,17 @@ function ModelRenderer(gameObj, model) {
   GameComponent.call(this, gameObj);
   this.model = model;
   gameObj.addPublicProperties({
-    world: new Float32Array(16)
+    world: new Float32Array(16),
+    lightColor: new Float32Array([1, 1, 1, 1])
   });
 
   var pp = gameObj.publicProperties;
   this.per = {
-    world: pp.world
+    world: pp.world,
+    lightColor: pp.lightColor
   };
+
+  g_game.sys['renderer'].addComponent(this);
 }
 
 ModelRenderer.prototype.draw = function(renderer) {
