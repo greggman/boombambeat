@@ -177,7 +177,10 @@ tdl.require('ge.gamesystem');
 
     var numToProcess = this.components.length;
     for (var ii = 0; ii < numToProcess; ++ii) {
-      this.components[ii].draw(this);
+      var component = this.components[ii];
+      if (component.gameObj) {
+        component.draw(this);
+      }
     }
 
   //  Log("--Draw sphere---------------------------------------");
@@ -212,6 +215,8 @@ tdl.require('ge.gamesystem');
     gl.colorMask(false, false, false, true);
     gl.clearColor(0,0,0,1);
     gl.clear(gl.COLOR_BUFFER_BIT);
+
+    ge.GameSystem.prototype.process.call(this, elapsedTime);
   };
 }());
 

@@ -51,7 +51,10 @@ tdl.base.inherit(ge.AIManager, ge.GameSystem);
 ge.AIManager.prototype.process = function(elapsedTime) {
   var numToProcess = this.components.length;
   for (var ii = 0; ii < numToProcess; ++ii) {
-    this.components[ii].process(elapsedTime);
+    var component = this.components[ii];
+    if (component.gameObj) {
+      component.process(elapsedTime);
+    }
   }
   ge.GameSystem.prototype.process.call(this, elapsedTime);
 };

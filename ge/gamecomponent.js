@@ -37,11 +37,24 @@
 tdl.provide('ge.gamecomponent');
 
 ge.GameComponent = function(gameObject) {
+  if (!gameObject) {
+    throw "no game object";
+  }
   this.gameObj = gameObject;
 }
 
-ge.GameComponent.prototype.clearObject = function() {
+ge.GameComponent.prototype.setSystem = function(system) {
+  this.system = system;
+};
+
+ge.GameComponent.prototype.clearGameObject = function() {
   this.gameObj = null;
+};
+
+ge.GameComponent.prototype.removeFromSystem = function() {
+  if (this.system) {
+    this.system.removeComponent(this);
+  }
 };
 
 

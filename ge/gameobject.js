@@ -45,6 +45,20 @@ ge.GameObject = function() {
   this.publicProperties = {};
 }
 
+ge.GameObject.prototype.destroy = function() {
+  // since we're going to be removing properties I'm guessing I need
+  // to get the list of properties before I start.
+  var props = [];
+  for (var name in this.components) {
+    props.push(name);
+  }
+  for (var ii = 0; ii < props.length; ++ii) {
+    //tdl.log("remove: " + props[ii]);
+    this.removeComponent(props[ii]);
+  }
+  ge.game.removeObject(this);
+};
+
 ge.GameObject.prototype.addComponent = function(name, component) {
   this.components[name] = component;
 };
@@ -52,6 +66,12 @@ ge.GameObject.prototype.addComponent = function(name, component) {
 ge.GameObject.prototype.removeComponent = function(name) {
   var component = this.components[name];
   delete this.components[name];
+  if (component.destroy) {
+    component.destroy();
+  }
+  if (component.removeFromSystem) {
+    component.removeFromSystem();
+  }
   component.clearGameObject(this);
 };
 

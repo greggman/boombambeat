@@ -86,10 +86,13 @@ ge.Game.prototype.process = function(elapsedTime) {
   }
 
   var numToRemove = this.objectsToRemove.length;
-  for (var ii = 0; ii < numToRemove; ++ii) {
-    this.objects.splice(this.indexOf(this.objectsToRemove[ii]), 1);
+  if (numToRemove) {
+    for (var ii = 0; ii < numToRemove; ++ii) {
+      var ndx = this.objects.indexOf(this.objectsToRemove[ii]);
+      this.objects.splice(ndx, 1);
+    }
+    this.objectsToRemove = [];
   }
-  this.objectsToRemove = [];
 };
 
 ge.Game.prototype.addSystem = function(name, system) {

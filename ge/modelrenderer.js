@@ -56,6 +56,8 @@ ge.ModelRenderer = function(gameObj, model) {
   ge.game.sys['renderer'].addComponent(this);
 }
 
+tdl.base.inherit(ge.ModelRenderer, ge.GameComponent);
+
 ge.ModelRenderer.prototype.draw = function(renderer) {
   renderer.drawPrep(this.model);
   renderer.draw(this.model, this.per);

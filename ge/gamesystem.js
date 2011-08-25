@@ -49,18 +49,22 @@ ge.GameSystem = function() {
 
 ge.GameSystem.prototype.addComponent = function(component) {
   this.components.push(component);
+  component.setSystem(this);
 };
 
 ge.GameSystem.prototype.removeComponent = function(component) {
-  this.objecstToRemove.push(component);
+  this.componentsToRemove.push(component);
 };
 
 ge.GameSystem.prototype.process = function(elapsedTime) {
   var numToRemove = this.componentsToRemove.length;
-  for (var ii = 0; ii < numToRemove; ++ii) {
-    this.components.splice(this.indexOf(this.componentsToRemove[ii]), 1);
+  if (numToRemove) {
+    for (var ii = 0; ii < numToRemove; ++ii) {
+      var ndx = this.components.indexOf(this.componentsToRemove[ii]);
+      this.components.splice(ndx , 1);
+    }
+    this.componentsToRemove = [];
   }
-  this.componentsToRemove = [];
 };
 
 
