@@ -57,7 +57,7 @@ function CirclePathFollower(gameObj) {
     position: [0, 0, 0],
     world: new Float32Array(16)
   });
-  g_game.sys['aiManager'].addComponent(this);
+  ge.game.sys['aiManager'].addComponent(this);
 };
 
 tdl.base.inherit(CirclePathFollower, ge.GameComponent);
@@ -94,7 +94,7 @@ function HighlightWhenUnderMouse(gameObj) {
   });
   this.red = new Float32Array([1, 0, 0, 1]);
   this.white = new Float32Array([1, 1, 1, 1]);
-  g_game.sys['aiManager'].addComponent(this);
+  ge.game.sys['aiManager'].addComponent(this);
 };
 
 tdl.base.inherit(HighlightWhenUnderMouse, ge.GameComponent);
@@ -108,7 +108,7 @@ HighlightWhenUnderMouse.prototype.process = function(elapsedTime) {
 
 function createCirclePathEnemy() {
   var g = new ge.GameObject();
-  var model = g_game.sys['modelManager'].getModel("cube");
+  var model = ge.game.sys['modelManager'].getModel("cube");
   g.addComponent("ai", new CirclePathFollower(g));
   g.addComponent("mouseTarget", new ge.MouseTarget(g, 1.0));
   g.addComponent("highlightWhenUnderMouse", new HighlightWhenUnderMouse(g));
@@ -119,13 +119,13 @@ function createCirclePathEnemy() {
 
 function initialize() {
   var canvas = document.getElementById("canvas");
-  g_game = new ge.Game();
+  var game = new ge.Game();
 
-  g_game.addSystem("inputManager", new ge.InputManager(canvas));
-  g_game.addSystem("aiManager", new ge.AIManager());
-  g_game.addSystem("renderer", new ge.Renderer(canvas));
-  g_game.addSystem("modelManager", new ge.ModelManager());
-  g_game.addSystem(
+  game.addSystem("inputManager", new ge.InputManager(canvas));
+  game.addSystem("aiManager", new ge.AIManager());
+  game.addSystem("renderer", new ge.Renderer(canvas));
+  game.addSystem("modelManager", new ge.ModelManager());
+  game.addSystem(
       "fpsCounter", new ge.FPSCounter(document.getElementById("fps")));
 
   var level1 = {
@@ -148,7 +148,7 @@ function initialize() {
     ]
   };
 
-  g_game.addSystem("enemyLauncher", new ge.EnemyLauncher(level1.enemies));
+  game.addSystem("enemyLauncher", new ge.EnemyLauncher(level1.enemies));
 
   return true;
 }
