@@ -39,16 +39,10 @@ tdl.provide('ge.inputmanager');
 tdl.require('ge.gamesystem');
 
 /**
- * A module for InputManager.
- * @namespace
- */
-ge.inputmanager = ge.inputmanager || {};
-
-/**
  * Processes Mouse Events
  * @constructor
  */
-function InputManager(element) {
+ge.InputManager = function(element) {
   this.element = element;
   this.mouseX = 0;
   this.mouseY = 0;
@@ -73,7 +67,7 @@ function InputManager(element) {
   }, false);
 };
 
-InputManager.prototype.handleMouseUp = function(event) {
+ge.InputManager.prototype.handleMouseUp = function(event) {
   this.updatePosition(event);
   if (this.mouseDown) {
     this.mouseDown = false;
@@ -82,7 +76,7 @@ InputManager.prototype.handleMouseUp = function(event) {
   }
 };
 
-InputManager.prototype.handleMouseDown = function(event) {
+ge.InputManager.prototype.handleMouseDown = function(event) {
   this.updatePosition(event);
   if (!this.mouseDown) {
     this.mouseDown = true;
@@ -91,11 +85,11 @@ InputManager.prototype.handleMouseDown = function(event) {
   }
 };
 
-InputManager.prototype.handleMouseMove = function(event) {
+ge.InputManager.prototype.handleMouseMove = function(event) {
   this.updatePosition(event);
 };
 
-InputManager.prototype.handleMouseOut = function(event) {
+ge.InputManager.prototype.handleMouseOut = function(event) {
   this.mouseDown = false;
 };
 
@@ -187,7 +181,7 @@ InputManager.prototype.handleMouseOut = function(event) {
     };
   };
 
-  InputManager.prototype.updatePosition = function(event) {
+  ge.InputManager.prototype.updatePosition = function(event) {
     var info = getEventInfo(event);
     var m = getRelativeCoordinates(info);
     this.mouseX = m.x;
@@ -195,7 +189,7 @@ InputManager.prototype.handleMouseOut = function(event) {
   };
 }());
 
-InputManager.prototype.process = function(elapsedTime) {
+ge.InputManager.prototype.process = function(elapsedTime) {
   if (this.clearTimer > 0) {
     this.clearTimer -= elapsedTime;
     if (this.clearTime <= 0) {

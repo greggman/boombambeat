@@ -39,22 +39,16 @@ tdl.provide('ge.enemylauncher');
 tdl.require('ge.gamecomponent');
 
 /**
- * A module for EnemyLauncher.
- * @namespace
- */
-ge.enemylauncher = ge.enemylauncher || {};
-
-/**
  * Launches enemies
  * @constructor
  */
-function EnemyLauncher(enemyList) {
+ge.EnemyLauncher = function(enemyList) {
   this.enemyList = enemyList;
   this.clock = 0;
   this.index = 0;
 }
 
-EnemyLauncher.prototype.process = function(elapsedTime) {
+ge.EnemyLauncher.prototype.process = function(elapsedTime) {
   this.clock += elapsedTime;
   while (this.index < this.enemyList.length &&
          this.clock >= this.enemyList[this.index].time) {

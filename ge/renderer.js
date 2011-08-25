@@ -42,12 +42,6 @@ tdl.require('tdl.webgl');
 
 tdl.require('ge.gamesystem');
 
-/**
- * A module for Renderer.
- * @namespace
- */
-ge.renderer = ge.renderer || {};
-
 (function() {
   var math = tdl.math;
   var fast = tdl.fast;
@@ -93,8 +87,8 @@ ge.renderer = ge.renderer || {};
     worldInverseTranspose: worldInverseTranspose};
 
 
-  Renderer = function(canvas) {
-    GameSystem.call(this);
+  ge.Renderer = function(canvas) {
+    ge.GameSystem.call(this);
     this.canvas = canvas;
 
     gl = tdl.webgl.setupWebGL(canvas);
@@ -106,31 +100,31 @@ ge.renderer = ge.renderer || {};
     }
   };
 
-  tdl.base.inherit(Renderer, GameSystem);
+  tdl.base.inherit(ge.Renderer, ge.GameSystem);
 
-  Renderer.prototype.getViewProjectionInverse = function() {
+  ge.Renderer.prototype.getViewProjectionInverse = function() {
     return viewProjectionInverse;
   };
 
-  Renderer.prototype.drawPrep = function(model) {
+  ge.Renderer.prototype.drawPrep = function(model) {
     if (model != lastModel) {
       lastModel = model;
       model.drawPrep(sphereConst);
     }
   };
 
-  Renderer.prototype.computeMatrices = function(world) {
+  ge.Renderer.prototype.computeMatrices = function(world) {
     mat4.mul(worldViewProjection, world, viewProjection);
     mat4.inverse(worldInverse, world);
     mat4.transpose(worldInverseTranspose, worldInverse);
   };
 
-  Renderer.prototype.draw = function(model, per) {
+  ge.Renderer.prototype.draw = function(model, per) {
     this.computeMatrices(per.world);
     model.draw(spherePer, per);
   };
 
-  Renderer.prototype.process = function(elapsedTime) {
+  ge.Renderer.prototype.process = function(elapsedTime) {
 
     lastModel = null;
     clock += elapsedTime;

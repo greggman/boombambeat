@@ -39,27 +39,21 @@ tdl.provide('ge.aimanager');
 tdl.require('ge.gamesystem');
 
 /**
- * A module for AIManager.
- * @namespace
- */
-ge.aimanager = ge.aimanager || {};
-
-/**
  * Runs all the AI components.
  * @constructor
  */
-function AIManager() {
-  GameSystem.call(this);
+ge.AIManager = function() {
+  ge.GameSystem.call(this);
 };
 
-tdl.base.inherit(AIManager, GameSystem);
+tdl.base.inherit(ge.AIManager, ge.GameSystem);
 
-AIManager.prototype.process = function(elapsedTime) {
+ge.AIManager.prototype.process = function(elapsedTime) {
   var numToProcess = this.components.length;
   for (var ii = 0; ii < numToProcess; ++ii) {
     this.components[ii].process(elapsedTime);
   }
-  GameSystem.prototype.process.call(this, elapsedTime);
+  ge.GameSystem.prototype.process.call(this, elapsedTime);
 };
 
 

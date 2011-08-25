@@ -36,18 +36,12 @@
 
 tdl.provide('ge.fpscounter');
 
-/**
- * A module for FPSCounter.
- * @namespace
- */
-ge.fpscounter = ge.fpscounter || {};
-
-function FPSCounter(element) {
+ge.FPSCounter = function(element) {
   this.fpsTimer = new tdl.fps.FPSTimer();
   this.fpsElem = element;
 }
 
-FPSCounter.prototype.process = function(elapsedTime) {
+ge.FPSCounter.prototype.process = function(elapsedTime) {
   this.fpsTimer.update(elapsedTime);
   this.fpsElem.innerHTML = this.fpsTimer.averageFPS;
 };

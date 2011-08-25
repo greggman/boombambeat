@@ -39,16 +39,10 @@ tdl.provide('ge.game');
 tdl.require('tdl.webgl');
 
 /**
- * A module for game.
- * @namespace
- */
-ge.game = ge.game || {};
-
-/**
  * This is main game.
  * @constructor
  */
-function Game() {
+ge.Game = function() {
   this.objects = [];
   this.systems = [];
   this.sys = {};  // systems by name
@@ -59,7 +53,7 @@ function Game() {
   this.tick();
 };
 
-Game.prototype.tick = function() {
+ge.Game.prototype.tick = function() {
   ++this.tickCount;
   var now = (new Date()).getTime() * 0.001;
   var elapsedTime = now - this.then;
@@ -78,7 +72,7 @@ Game.prototype.tick = function() {
   g_logGLCalls = false;
 };
 
-Game.prototype.process = function(elapsedTime) {
+ge.Game.prototype.process = function(elapsedTime) {
   var systems = this.systems;
   var numSystems = systems.length;
   for (var ii = 0; ii < numSystems; ++ii) {
@@ -95,16 +89,16 @@ Game.prototype.process = function(elapsedTime) {
   this.objectsToRemove = [];
 };
 
-Game.prototype.addSystem = function(name, system) {
+ge.Game.prototype.addSystem = function(name, system) {
   this.systems.push(system);
   this.sys[name] = system;
 };
 
-Game.prototype.addObject = function(object) {
+ge.Game.prototype.addObject = function(object) {
   this.objects.push(object);
 };
 
-Game.prototype.removeObject = function(object) {
+ge.Game.prototype.removeObject = function(object) {
   this.objectsToRemove.push(object);
 };
 

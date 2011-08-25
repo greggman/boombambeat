@@ -36,17 +36,11 @@
 
 tdl.provide('ge.gamecomponent');
 
-/**
- * A module for misc.
- * @namespace
- */
-ge.gamecomponent = ge.gamecomponent || {};
-
-function GameComponent(gameObject) {
+ge.GameComponent = function(gameObject) {
   this.gameObj = gameObject;
 }
 
-GameComponent.prototype.clearObject = function() {
+ge.GameComponent.prototype.clearObject = function() {
   this.gameObj = null;
 };
 

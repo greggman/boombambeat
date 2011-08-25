@@ -39,14 +39,8 @@ tdl.provide('ge.modelrenderer');
 tdl.require('ge.gamecomponent');
 tdl.require('ge.renderer');
 
-/**
- * A module for ModelRenderr.
- * @namespace
- */
-ge.modelrenderer = ge.modelrenderer || {};
-
-function ModelRenderer(gameObj, model) {
-  GameComponent.call(this, gameObj);
+ge.ModelRenderer = function(gameObj, model) {
+  ge.GameComponent.call(this, gameObj);
   this.model = model;
   gameObj.addPublicProperties({
     world: new Float32Array(16),
@@ -62,7 +56,7 @@ function ModelRenderer(gameObj, model) {
   g_game.sys['renderer'].addComponent(this);
 }
 
-ModelRenderer.prototype.draw = function(renderer) {
+ge.ModelRenderer.prototype.draw = function(renderer) {
   renderer.drawPrep(this.model);
   renderer.draw(this.model, this.per);
 };

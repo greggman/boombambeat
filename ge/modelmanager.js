@@ -42,13 +42,7 @@ tdl.require('tdl.programs');
 tdl.require('tdl.textures');
 tdl.require('ge.gamesystem');
 
-/**
- * A module for ModelManager.
- * @namespace
- */
-ge.modelmanager = ge.modelmanager || {};
-
-function ModelManager() {
+ge.ModelManager = function() {
   this.models = {};
 
   /**
@@ -79,10 +73,10 @@ function ModelManager() {
   this.models.cube = setupCube();
 };
 
-ModelManager.prototype.process = function() {
+ge.ModelManager.prototype.process = function() {
 };
 
-ModelManager.prototype.getModel = function(name) {
+ge.ModelManager.prototype.getModel = function(name) {
   return this.models[name];
 };
 

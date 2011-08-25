@@ -37,31 +37,25 @@
 tdl.provide('ge.gameobject');
 
 /**
- * A module for GameObject.
- * @namespace
- */
-ge.gameobject = ge.gameobject || {};
-
-/**
  * A Game Object is just a bucket of components and shared public properties.
  * @constructor
  */
-function GameObject() {
+ge.GameObject = function() {
   this.components = {};
   this.publicProperties = {};
 }
 
-GameObject.prototype.addComponent = function(name, component) {
+ge.GameObject.prototype.addComponent = function(name, component) {
   this.components[name] = component;
 };
 
-GameObject.prototype.removeComponent = function(name) {
+ge.GameObject.prototype.removeComponent = function(name) {
   var component = this.components[name];
   delete this.components[name];
   component.clearGameObject(this);
 };
 
-GameObject.prototype.addPublicProperties = function(obj) {
+ge.GameObject.prototype.addPublicProperties = function(obj) {
   // TODO(gman): this probably needs to be a deep copy.
   var pp = this.publicProperties;
   for (var prop in obj) {

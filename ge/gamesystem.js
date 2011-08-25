@@ -39,29 +39,23 @@ tdl.provide('ge.gamesystem');
 tdl.require('tdl.webgl');
 
 /**
- * A module for gamesystem.
- * @namespace
- */
-ge.gamesystem = ge.gamesystem || {};
-
-/**
  * This is a base for game systems.
  * @constructor
  */
-function GameSystem() {
+ge.GameSystem = function() {
   this.components = [];
   this.componentsToRemove = [];
 }
 
-GameSystem.prototype.addComponent = function(component) {
+ge.GameSystem.prototype.addComponent = function(component) {
   this.components.push(component);
 };
 
-GameSystem.prototype.removeComponent = function(component) {
+ge.GameSystem.prototype.removeComponent = function(component) {
   this.objecstToRemove.push(component);
 };
 
-GameSystem.prototype.process = function(elapsedTime) {
+ge.GameSystem.prototype.process = function(elapsedTime) {
   var numToRemove = this.componentsToRemove.length;
   for (var ii = 0; ii < numToRemove; ++ii) {
     this.components.splice(this.indexOf(this.componentsToRemove[ii]), 1);

@@ -40,20 +40,14 @@ tdl.require('tdl.math');
 tdl.require('tdl.fast');
 tdl.require('ge.gamesystem');
 
-/**
- * A module for MouseTarget.
- * @namespace
- */
-ge.mousetarget = ge.mousetarget || {};
-
 (function(){
 /**
  * Checks when the mouse is over it.
  * @constructor
  * @param gameObj
  */
-MouseTarget = function(gameObj, radius) {
-  GameComponent.call(this, gameObj);
+ge.MouseTarget = function(gameObj, radius) {
+  ge.GameComponent.call(this, gameObj);
   g_game.sys['aiManager'].addComponent(this);
   this.inputManager = g_game.sys['inputManager'];
   this.renderer = g_game.sys['renderer'];
@@ -64,7 +58,7 @@ MouseTarget = function(gameObj, radius) {
   });
 };
 
-tdl.base.inherit(MouseTarget, GameComponent);
+tdl.base.inherit(ge.MouseTarget, ge.GameComponent);
 
 
 /**
@@ -131,7 +125,7 @@ var clientPositionToWorldRay = function(
   };
 };
 
-MouseTarget.prototype.process = function(elapsedTime) {
+ge.MouseTarget.prototype.process = function(elapsedTime) {
   var inputManager = this.inputManager;
   var canvas = this.renderer.canvas;
   var pp = this.gameObj.publicProperties;

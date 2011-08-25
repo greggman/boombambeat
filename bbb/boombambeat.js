@@ -59,7 +59,7 @@ function LogGLCall(functionName, args) {
  * @constructor
  */
 function CirclePathFollower(gameObj) {
-  GameComponent.call(this, gameObj);
+  ge.GameComponent.call(this, gameObj);
   this.clock = 0;
   gameObj.addPublicProperties({
     position: [0, 0, 0],
@@ -68,7 +68,7 @@ function CirclePathFollower(gameObj) {
   g_game.sys['aiManager'].addComponent(this);
 };
 
-tdl.base.inherit(CirclePathFollower, GameComponent);
+tdl.base.inherit(CirclePathFollower, ge.GameComponent);
 
 CirclePathFollower.prototype.process = function(elapsedTime) {
   this.clock += elapsedTime;
@@ -89,7 +89,7 @@ CirclePathFollower.prototype.process = function(elapsedTime) {
  * @author gman (8/24/2011)
  */
 function HighlightWhenUnderMouse(gameObj) {
-  GameComponent.call(this, gameObj);
+  ge.GameComponent.call(this, gameObj);
   gameObj.addPublicProperties({
     lightColor: new Float32Array([1, 1, 1, 1]),
     mouseIsOver: false
@@ -99,7 +99,7 @@ function HighlightWhenUnderMouse(gameObj) {
   g_game.sys['aiManager'].addComponent(this);
 };
 
-tdl.base.inherit(HighlightWhenUnderMouse, GameComponent);
+tdl.base.inherit(HighlightWhenUnderMouse, ge.GameComponent);
 
 HighlightWhenUnderMouse.prototype.process = function(elapsedTime) {
   var pp = this.gameObj.publicProperties;
@@ -109,12 +109,12 @@ HighlightWhenUnderMouse.prototype.process = function(elapsedTime) {
 /* ---------------------------------------------------------------------------*/
 
 function createCirclePathEnemy() {
-  var g = new GameObject();
+  var g = new ge.GameObject();
   var model = g_game.sys['modelManager'].getModel("cube");
   g.addComponent("ai", new CirclePathFollower(g));
-  g.addComponent("mouseTarget", new MouseTarget(g, 1.0));
+  g.addComponent("mouseTarget", new ge.MouseTarget(g, 1.0));
   g.addComponent("highlightWhenUnderMouse", new HighlightWhenUnderMouse(g));
-  g.addComponent("modelRender", new ModelRenderer(g, model));
+  g.addComponent("modelRender", new ge.ModelRenderer(g, model));
   return g;
 }
 
@@ -124,14 +124,14 @@ function initialize() {
   fast = tdl.fast;
   mat4 = fast.matrix4;
   canvas = document.getElementById("canvas");
-  g_game = new Game();
+  g_game = new ge.Game();
 
-  g_game.addSystem("inputManager", new InputManager(canvas));
-  g_game.addSystem("aiManager", new AIManager());
-  g_game.addSystem("renderer", new Renderer(canvas));
-  g_game.addSystem("modelManager", new ModelManager());
+  g_game.addSystem("inputManager", new ge.InputManager(canvas));
+  g_game.addSystem("aiManager", new ge.AIManager());
+  g_game.addSystem("renderer", new ge.Renderer(canvas));
+  g_game.addSystem("modelManager", new ge.ModelManager());
   g_game.addSystem(
-      "fpsCounter", new FPSCounter(document.getElementById("fps")));
+      "fpsCounter", new ge.FPSCounter(document.getElementById("fps")));
 
   var level1 = {
     enemies: [
@@ -153,7 +153,7 @@ function initialize() {
     ]
   };
 
-  g_game.addSystem("enemyLauncher", new EnemyLauncher(level1.enemies));
+  g_game.addSystem("enemyLauncher", new ge.EnemyLauncher(level1.enemies));
 
   return true;
 }
