@@ -148,7 +148,7 @@ function initialize() {
     ]
   };
 
-  game.addSystem("enemyLauncher", new ge.EnemyLauncher(level1.enemies));
+  game.addSystem("objectLauncher", new ge.ObjectLauncher(level1.enemies));
 
   return true;
 }

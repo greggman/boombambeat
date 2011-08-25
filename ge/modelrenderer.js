@@ -31,7 +31,7 @@
 
 
 /**
- * @fileoverview This file contains the 'ModelRenderr' implemenation.
+ * @fileoverview This file contains the 'ModelRender' implemenation.
  */
 
 tdl.provide('ge.modelrenderer');

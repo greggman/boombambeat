@@ -31,10 +31,10 @@
 
 
 /**
- * @fileoverview This file contains the 'ModelRenderr' implemenation.
+ * @fileoverview This file contains the 'ObjectLauncher' implemenation.
  */
 
-tdl.provide('ge.enemylauncher');
+tdl.provide('ge.objectlauncher');
 
 tdl.require('ge.gamecomponent');
 
@@ -42,13 +42,13 @@ tdl.require('ge.gamecomponent');
  * Launches enemies
  * @constructor
  */
-ge.EnemyLauncher = function(enemyList) {
+ge.ObjectLauncher = function(enemyList) {
   this.enemyList = enemyList;
   this.clock = 0;
   this.index = 0;
 }
 
-ge.EnemyLauncher.prototype.process = function(elapsedTime) {
+ge.ObjectLauncher.prototype.process = function(elapsedTime) {
   this.clock += elapsedTime;
   while (this.index < this.enemyList.length &&
          this.clock >= this.enemyList[this.index].time) {
