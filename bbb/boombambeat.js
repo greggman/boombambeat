@@ -52,6 +52,8 @@ function LogGLCall(functionName, args) {
   }
 }
 
+/* ---------------------------------------------------------------------------*/
+
 /**
  * Follows a cirucular path.
  * @constructor
@@ -79,11 +81,39 @@ CirclePathFollower.prototype.process = function(elapsedTime) {
   //mat4.mul(world, m4t0, m4t1);
 };
 
+/* ---------------------------------------------------------------------------*/
+
+/**
+ * Highlights the object when under the mouse.
+ *
+ * @author gman (8/24/2011)
+ */
+function HighlightWhenUnderMouse(gameObj) {
+  GameComponent.call(this, gameObj);
+  gameObj.addPublicProperties({
+    lightColor: new Float32Array([1, 1, 1, 1]),
+    mouseIsOver: false
+  });
+  this.red = new Float32Array([1, 0, 0, 1]);
+  this.white = new Float32Array([1, 1, 1, 1]);
+  g_game.sys['aiManager'].addComponent(this);
+};
+
+tdl.base.inherit(HighlightWhenUnderMouse, GameComponent);
+
+HighlightWhenUnderMouse.prototype.process = function(elapsedTime) {
+  var pp = this.gameObj.publicProperties;
+  pp.lightColor.set(pp.mouseIsOver ? this.red : this.white);
+};
+
+/* ---------------------------------------------------------------------------*/
+
 function createCirclePathEnemy() {
   var g = new GameObject();
   var model = g_game.sys['modelManager'].getModel("cube");
   g.addComponent("ai", new CirclePathFollower(g));
-  g.addComponent("mouseTarget", new MouseTarget(g));
+  g.addComponent("mouseTarget", new MouseTarget(g, 1.0));
+  g.addComponent("highlightWhenUnderMouse", new HighlightWhenUnderMouse(g));
   g.addComponent("modelRender", new ModelRenderer(g, model));
   return g;
 }

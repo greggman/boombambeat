@@ -52,18 +52,16 @@ ge.mousetarget = ge.mousetarget || {};
  * @constructor
  * @param gameObj
  */
-MouseTarget = function(gameObj) {
+MouseTarget = function(gameObj, radius) {
   GameComponent.call(this, gameObj);
   g_game.sys['aiManager'].addComponent(this);
   this.inputManager = g_game.sys['inputManager'];
   this.renderer = g_game.sys['renderer'];
   gameObj.addPublicProperties({
+    mouseTargetRadius: radius,
     world: new Float32Array(16),
-    lightColor: new Float32Array([1, 1, 1, 1])
+    mouseIsOver: false
   });
-
-  this.red = new Float32Array([1, 0, 0, 1]);
-  this.gray = new Float32Array([1, 1, 1, 1]);
 };
 
 tdl.base.inherit(MouseTarget, GameComponent);
@@ -149,8 +147,8 @@ MouseTarget.prototype.process = function(elapsedTime) {
   var near = raySphereIntersection(
       ray.near, ray.far,
       [pp.world[12], pp.world[13], pp.world[14]],
-      1);
-  pp.lightColor.set(near ? this.red : this.gray);
+      pp.mouseTargetRadius);
+  pp.mouseIsOver = near !== undefined;
 };
 
 }());
