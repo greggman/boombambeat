@@ -53,7 +53,7 @@ ge.EnemyLauncher.prototype.process = function(elapsedTime) {
   while (this.index < this.enemyList.length &&
          this.clock >= this.enemyList[this.index].time) {
     var enemyInfo = this.enemyList[this.index++];
-    g_game.addObject(enemyInfo.type());
+    ge.game.addObject(enemyInfo.type());
   }
 };
 

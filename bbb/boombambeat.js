@@ -4,20 +4,12 @@ bbb.boombambeat = bbb.boombambeat || {};
 
 // globals
 var gl;                   // the gl context.
-var canvas;               // the canvas.
-var math;                 // the math lib.
-var fast;                 // the fast math lib.
-var mat4;                 // the matrix functions of the fast math lib.
 var g_logGLCalls = true;  // whether or not to log webgl calls
 var g_debug = false;      // whether or not to debug.
 var g_drawOnce = false;   // draw just one frame.
 
 //g_drawOnce = true;
 //g_debug = true;
-
-var g_eyeSpeed          = 0.5;
-var g_eyeHeight         = 2;
-var g_eyeRadius         = 9;
 
 function ValidateNoneOfTheArgsAreUndefined(functionName, args) {
   for (var ii = 0; ii < args.length; ++ii) {
@@ -70,6 +62,11 @@ function CirclePathFollower(gameObj) {
 
 tdl.base.inherit(CirclePathFollower, ge.GameComponent);
 
+(function() {
+var math = tdl.math;
+var fast = tdl.fast;
+var mat4 = fast.matrix4;
+
 CirclePathFollower.prototype.process = function(elapsedTime) {
   this.clock += elapsedTime;
   var pp = this.gameObj.publicProperties;
@@ -80,6 +77,7 @@ CirclePathFollower.prototype.process = function(elapsedTime) {
   mat4.translation(pp.world, pp.position);
   //mat4.mul(world, m4t0, m4t1);
 };
+}());
 
 /* ---------------------------------------------------------------------------*/
 
@@ -120,10 +118,7 @@ function createCirclePathEnemy() {
 
 
 function initialize() {
-  math = tdl.math;
-  fast = tdl.fast;
-  mat4 = fast.matrix4;
-  canvas = document.getElementById("canvas");
+  var canvas = document.getElementById("canvas");
   g_game = new ge.Game();
 
   g_game.addSystem("inputManager", new ge.InputManager(canvas));

@@ -128,6 +128,11 @@ tdl.require('ge.gamesystem');
 
     lastModel = null;
     clock += elapsedTime;
+
+    var g_eyeSpeed          = 0.5;
+    var g_eyeHeight         = 2;
+    var g_eyeRadius         = 9;
+
     eyePosition[0] = Math.sin(clock * g_eyeSpeed) * g_eyeRadius;
     eyePosition[1] = g_eyeHeight;
     eyePosition[2] = Math.cos(clock * g_eyeSpeed) * g_eyeRadius;
@@ -144,7 +149,7 @@ tdl.require('ge.gamesystem');
     mat4.perspective(
         projection,
         math.degToRad(60),
-        canvas.clientWidth / canvas.clientHeight,
+        this.canvas.clientWidth / this.canvas.clientHeight,
         1,
         5000);
     mat4.lookAt(

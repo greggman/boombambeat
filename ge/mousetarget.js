@@ -41,6 +41,11 @@ tdl.require('tdl.fast');
 tdl.require('ge.gamesystem');
 
 (function(){
+
+var math = tdl.math;
+var fast = tdl.fast;
+var mat4 = fast.matrix4;
+
 /**
  * Checks when the mouse is over it.
  * @constructor
@@ -48,9 +53,9 @@ tdl.require('ge.gamesystem');
  */
 ge.MouseTarget = function(gameObj, radius) {
   ge.GameComponent.call(this, gameObj);
-  g_game.sys['aiManager'].addComponent(this);
-  this.inputManager = g_game.sys['inputManager'];
-  this.renderer = g_game.sys['renderer'];
+  ge.game.sys['aiManager'].addComponent(this);
+  this.inputManager = ge.game.sys['inputManager'];
+  this.renderer = ge.game.sys['renderer'];
   gameObj.addPublicProperties({
     mouseTargetRadius: radius,
     world: new Float32Array(16),

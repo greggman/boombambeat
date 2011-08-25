@@ -51,6 +51,9 @@ ge.Game = function() {
 
   this.then = (new Date()).getTime() * 0.001;
   this.tick();
+
+  // for now there is only 1 game at a time.
+  ge.game = this;
 };
 
 ge.Game.prototype.tick = function() {

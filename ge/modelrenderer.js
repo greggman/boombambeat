@@ -53,7 +53,7 @@ ge.ModelRenderer = function(gameObj, model) {
     lightColor: pp.lightColor
   };
 
-  g_game.sys['renderer'].addComponent(this);
+  ge.game.sys['renderer'].addComponent(this);
 }
 
 ge.ModelRenderer.prototype.draw = function(renderer) {
