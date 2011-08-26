@@ -178,7 +178,7 @@ tdl.require('ge.gamesystem');
     var numToProcess = this.components.length;
     for (var ii = 0; ii < numToProcess; ++ii) {
       var component = this.components[ii];
-      if (component.gameObj) {
+      if (component.gameObject) {
         component.draw(this);
       }
     }

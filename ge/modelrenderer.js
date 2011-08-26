@@ -39,15 +39,15 @@ tdl.provide('ge.modelrenderer');
 tdl.require('ge.gamecomponent');
 tdl.require('ge.renderer');
 
-ge.ModelRenderer = function(name, gameObj, model) {
-  ge.GameComponent.call(this, name, gameObj);
+ge.ModelRenderer = function(name, gameObject, model) {
+  ge.GameComponent.call(this, name, gameObject);
   this.model = model;
-  gameObj.addPublicProperties({
+  gameObject.addPublicProperties({
     world: new Float32Array(16),
     lightColor: new Float32Array([1, 1, 1, 1])
   });
 
-  var pp = gameObj.publicProperties;
+  var pp = gameObject.publicProperties;
   this.per = {
     world: pp.world,
     lightColor: pp.lightColor

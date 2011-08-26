@@ -16,7 +16,6 @@ tdl.require('ge.gameobject');
 tdl.require('ge.modelmanager');
 tdl.require('ge.renderer');
 tdl.require('ge.modelrenderer');
-tdl.require('ge.objectlauncher');
 tdl.require('ge.fpscounter');
 tdl.require('ge.aimanager');
 tdl.require('ge.inputmanager');

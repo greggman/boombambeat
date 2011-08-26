@@ -41,7 +41,7 @@ ge.GameComponent = function(name, gameObject) {
   if (!gameObject) {
     throw "no game object";
   }
-  this.gameObj = gameObject;
+  this.gameObject = gameObject;
 }
 
 ge.GameComponent.prototype.setSystem = function(system) {
@@ -49,7 +49,7 @@ ge.GameComponent.prototype.setSystem = function(system) {
 };
 
 ge.GameComponent.prototype.clearGameObject = function() {
-  this.gameObj = null;
+  this.gameObject = null;
 };
 
 ge.GameComponent.prototype.removeFromSystem = function() {

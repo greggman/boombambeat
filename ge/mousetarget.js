@@ -49,14 +49,14 @@ var mat4 = fast.matrix4;
 /**
  * Checks when the mouse is over it.
  * @constructor
- * @param gameObj
+ * @param gameObject
  */
-ge.MouseTarget = function(name, gameObj, radius) {
-  ge.GameComponent.call(this, name, gameObj);
+ge.MouseTarget = function(name, gameObject, radius) {
+  ge.GameComponent.call(this, name, gameObject);
   ge.game.sys['aiManager'].addComponent(this);
   this.inputManager = ge.game.sys['inputManager'];
   this.renderer = ge.game.sys['renderer'];
-  gameObj.addPublicProperties({
+  gameObject.addPublicProperties({
     mouseTargetRadius: radius,
     mouseRayNear: new Float32Array(3),
     mouseRayFar: new Float32Array(3),
@@ -131,10 +131,12 @@ var clientPositionToWorldRay = function(
   };
 };
 
+var sphereCenterTemp = new Float32Array(3);
+
 ge.MouseTarget.prototype.process = function(elapsedTime) {
   var inputManager = this.inputManager;
   var canvas = this.renderer.canvas;
-  var pp = this.gameObj.publicProperties;
+  var pp = this.gameObject.publicProperties;
 
   // TODO(gman): Optimization. This ray is the same for all MouseTarget
   // objects.
@@ -144,9 +146,10 @@ ge.MouseTarget.prototype.process = function(elapsedTime) {
       canvas.clientWidth,
       canvas.clientHeight,
       this.renderer.getViewProjectionInverse());
+  mat4.getTranslation(sphereCenterTemp, pp.world);
   var near = raySphereIntersection(
       ray.near, ray.far,
-      [pp.world[12], pp.world[13], pp.world[14]],
+      sphereCenterTemp,
       pp.mouseTargetRadius);
   pp.mouseIsOver = near !== undefined;
   if (near) {
