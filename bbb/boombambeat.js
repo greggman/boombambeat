@@ -55,8 +55,8 @@ function LogGLCall(functionName, args) {
  * Follows a cirucular path.
  * @constructor
  */
-function CirclePathFollower(gameObj) {
-  ge.GameComponent.call(this, gameObj);
+function CirclePathFollower(name, gameObj) {
+  ge.GameComponent.call(this, name, gameObj);
   this.clock = 0;
   gameObj.addPublicProperties({
     position: [0, 0, 0],
@@ -91,8 +91,8 @@ CirclePathFollower.prototype.process = function(elapsedTime) {
  *
  * @author gman (8/24/2011)
  */
-function HighlightWhenUnderMouse(gameObj) {
-  ge.GameComponent.call(this, gameObj);
+function HighlightWhenUnderMouse(name, gameObj) {
+  ge.GameComponent.call(this, name, gameObj);
   gameObj.addPublicProperties({
     lightColor: new Float32Array([1, 1, 1, 1]),
     mouseIsOver: false
@@ -112,14 +112,41 @@ HighlightWhenUnderMouse.prototype.process = function(elapsedTime) {
 /* ---------------------------------------------------------------------------*/
 
 /**
+ * Fires at the object when under the mouse.
+ *
+ * @author gman (8/24/2011)
+ */
+function FireWhenUnderMouse(name, gameObj) {
+  ge.GameComponent.call(this, name, gameObj);
+  gameObj.addPublicProperties({
+    mouseIsOver: false,
+    mouseRayNear: new Float32Array(3),
+    mouseRayFar: new Float32Array(3)
+  });
+  ge.game.sys['aiManager'].addComponent(this);
+};
+
+tdl.base.inherit(FireWhenUnderMouse, ge.GameComponent);
+
+FireWhenUnderMouse.prototype.process = function(elapsedTime) {
+  var pp = this.gameObj.publicProperties;
+  if (pp.mouseIsOver) {
+    createMissile(pp.mouseRayNear, this.gameObj, 1.5);
+    this.gameObj.removeComponent(this);
+  }
+};
+
+/* ---------------------------------------------------------------------------*/
+
+/**
  * Increments variable on creation and decrements it on destruction
  *
  * @param {!ge.GameObject} gameObject
  * @param {!Object} obj
  * @param {string} propertyName
  */
-function Counter(gameObject, obj, propertyName) {
-  ge.GameComponent.call(this, gameObject);
+function Counter(name, gameObject, obj, propertyName) {
+  ge.GameComponent.call(this, name, gameObject);
   this.obj = obj;
   this.propertyName = propertyName;
   ++obj[propertyName];
@@ -140,8 +167,8 @@ Counter.prototype.destroy = function() {
  * @param gameObject
  * @param time
  */
-function KillTimer(gameObject, time) {
-  ge.GameComponent.call(this, gameObject);
+function KillTimer(name, gameObject, time) {
+  ge.GameComponent.call(this, name, gameObject);
   this.time = time;
   ge.game.sys['aiManager'].addComponent(this);
 }
@@ -157,17 +184,28 @@ KillTimer.prototype.process = function(elapsedTime) {
 
 /* ---------------------------------------------------------------------------*/
 
+function createMissile(startPosition, target, time) {
+  console.log('launch');
+//  var gobj = new ge.GameObject();
+//  var model = ge.game.sys['modelManager'].getModel("sphere");
+//  gobj.addComponent(new ge.ModelRenderer("modelRender", gobj, model));
+//  gobj.addComponent(new KillTimer("killTimer", gobj, 30));
+//  return gobj;
+}
+
 function createCirclePathEnemy() {
   var gobj = new ge.GameObject();
   var model = ge.game.sys['modelManager'].getModel("cube");
-  gobj.addComponent("counter", new Counter(gobj, g_gameGlobals, 'enemies'));
-  gobj.addComponent("ai", new CirclePathFollower(gobj));
-  gobj.addComponent("mouseTarget", new ge.MouseTarget(gobj, 1.0));
-  gobj.addComponent("highlightWhenUnderMouse", new HighlightWhenUnderMouse(gobj));
-  gobj.addComponent("modelRender", new ge.ModelRenderer(gobj, model));
-  gobj.addComponent("killTimer", new KillTimer(gobj, 3.5));
+  gobj.addComponent(new Counter("counter", gobj, g_gameGlobals, 'enemies'));
+  gobj.addComponent(new CirclePathFollower("ai", gobj));
+  gobj.addComponent(new ge.MouseTarget("mouseTarget", gobj, 1.0));
   gobj.addComponent(
-      "enemyCounter", new Counter(gobj, g_gameGlobals, 'enemyCount'));
+       new HighlightWhenUnderMouse("highlightWhenUnderMouse", gobj));
+  gobj.addComponent(new FireWhenUnderMouse("fireWhenUnderMouse", gobj));
+  gobj.addComponent(new ge.ModelRenderer("modelRender", gobj, model));
+  gobj.addComponent(new KillTimer("killTimer", gobj, 30));
+  gobj.addComponent(
+      new Counter("enemyCounter", gobj, g_gameGlobals, 'enemyCount'));
   return gobj;
 }
 

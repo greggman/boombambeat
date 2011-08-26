@@ -51,20 +51,21 @@ var mat4 = fast.matrix4;
  * @constructor
  * @param gameObj
  */
-ge.MouseTarget = function(gameObj, radius) {
-  ge.GameComponent.call(this, gameObj);
+ge.MouseTarget = function(name, gameObj, radius) {
+  ge.GameComponent.call(this, name, gameObj);
   ge.game.sys['aiManager'].addComponent(this);
   this.inputManager = ge.game.sys['inputManager'];
   this.renderer = ge.game.sys['renderer'];
   gameObj.addPublicProperties({
     mouseTargetRadius: radius,
+    mouseRayNear: new Float32Array(3),
+    mouseRayFar: new Float32Array(3),
     world: new Float32Array(16),
     mouseIsOver: false
   });
 };
 
 tdl.base.inherit(ge.MouseTarget, ge.GameComponent);
-
 
 /**
  * Calculate the intersection of a ray and a sphere
@@ -148,6 +149,10 @@ ge.MouseTarget.prototype.process = function(elapsedTime) {
       [pp.world[12], pp.world[13], pp.world[14]],
       pp.mouseTargetRadius);
   pp.mouseIsOver = near !== undefined;
+  if (near) {
+    pp.mouseRayNear.set(ray.near);
+    pp.mouseRayFar.set(ray.far);
+  }
 };
 
 }());

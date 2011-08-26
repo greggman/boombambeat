@@ -59,12 +59,20 @@ ge.GameObject.prototype.destroy = function() {
   ge.game.removeObject(this);
 };
 
-ge.GameObject.prototype.addComponent = function(name, component) {
-  this.components[name] = component;
+ge.GameObject.prototype.addComponent = function(component) {
+  this.components[component.name] = component;
 };
 
-ge.GameObject.prototype.removeComponent = function(name) {
-  var component = this.components[name];
+ge.GameObject.prototype.removeComponent = function(nameOrComponent) {
+  var name;
+  var component;
+  if (typeof nameOrComponent == "string") {
+    name = nameOrComponent;
+    component = this.components[name];
+  } else {
+    component = nameOrComponent;
+    name = component.name;
+  }
   delete this.components[name];
   if (component.destroy) {
     component.destroy();

@@ -39,8 +39,8 @@ tdl.provide('ge.modelrenderer');
 tdl.require('ge.gamecomponent');
 tdl.require('ge.renderer');
 
-ge.ModelRenderer = function(gameObj, model) {
-  ge.GameComponent.call(this, gameObj);
+ge.ModelRenderer = function(name, gameObj, model) {
+  ge.GameComponent.call(this, name, gameObj);
   this.model = model;
   gameObj.addPublicProperties({
     world: new Float32Array(16),

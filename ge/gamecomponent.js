@@ -36,7 +36,8 @@
 
 tdl.provide('ge.gamecomponent');
 
-ge.GameComponent = function(gameObject) {
+ge.GameComponent = function(name, gameObject) {
+  this.name = name;
   if (!gameObject) {
     throw "no game object";
   }
