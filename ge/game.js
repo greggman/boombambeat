@@ -68,7 +68,7 @@ ge.Game.prototype.tick = function() {
     var that = this;
     tdl.webgl.requestAnimationFrame(function() {
       that.tick();
-    }, canvas);
+    } /* , canvas */);
   }
 
   // turn off logging after 1 frame.
