@@ -77,5 +77,158 @@ void main() {
       diffuse.a);
 }
 </script>
+<script id="repeatVertexShader" type="text/something-not-javascript">
+uniform mat4 viewProjection;
+uniform vec3 lightWorldPos;
+uniform mat4 world;
+uniform mat4 viewInverse;
+uniform sampler2D offsetTexture;
+uniform vec4 offsetScale;
+
+attribute vec4 position;
+attribute vec3 normal;
+attribute vec2 texCoord;
+attribute vec4 extra;
+
+varying vec4 v_position;
+varying vec2 v_texCoord;
+varying vec3 v_normal;
+varying vec4 v_color;
+varying vec3 v_surfaceToLight;
+varying vec3 v_surfaceToView;
+
+const float kOffsetTextureHeight = 4.0;
+const float kPixelOffset = 1.0 / kOffsetTextureHeight;
+const float kHalfPixelOffset = kPixelOffset / 2.0;
+const float kOffsetXYZSLow = kHalfPixelOffset;
+const float kOffsetXYZSHigh = kHalfPixelOffset + kPixelOffset;
+const float kOffsetColor = kHalfPixelOffset + kPixelOffset * 2.0;
+const float kOffsetRotation = kHalfPixelOffset + kPixelOffset * 3.0;
+
+#if 0
+
+mat4 quatToMatrix(vec4 orientation, vec3 translation) {
+    float xx      = orientation.x * orientation.x;
+    float xy      = orientation.x * orientation.y;
+    float xz      = orientation.x * orientation.z;
+    float xw      = orientation.x * orientation.w;
+    float yy      = orientation.y * orientation.y;
+    float yz      = orientation.y * orientation.z;
+    float yw      = orientation.y * orientation.w;
+    float zz      = orientation.z * orientation.z;
+    float zw      = orientation.z * orientation.w;
+
+    return mat4(
+      1.0 - 2.0 * ( yy + zz ),
+            2.0 * ( xy - zw ),
+            2.0 * ( xz + yw ),
+      0,
+
+            2.0 * ( xy + zw ),
+      1.0 - 2.0 * ( xx + zz ),
+            2.0 * ( yz - xw ),
+      0,
+
+            2.0 * ( xz - yw ),
+            2.0 * ( yz + xw ),
+      1.0 - 2.0 * ( xx + yy ),
+      0,
+
+      translation.x, translation.y, translation.z, 1);
+}
+
+#else
+
+
+mat4 quatToMatrix(vec4 orientation, vec3 translation) {
+  vec4 q2 = orientation + orientation;
+  vec4 qx = orientation.xxxw * q2.xyzx;
+  vec4 qy = orientation.xyyw * q2.xyzy;
+  vec4 qz = orientation.xxzw * q2.xxzz;
+
+  return mat4(
+      (1.0 - qy.y) - qz.z,
+      qx.y + qz.w,
+      qx.z - qy.w,
+      0,
+
+      qx.y - qz.w,
+      (1.0 - qx.x) - qz.z,
+      qy.z + qx.w,
+      0,
+
+      qx.z + qy.w,
+      qy.z - qx.w,
+      (1.0 - qx.x) - qy.y,
+      0,
+
+      translation.x, translation.y, translation.z, 1);
+}
+#endif
+
+void main() {
+
+  vec4 xyzsLowOff = texture2D(offsetTexture, vec2(extra.x, kOffsetXYZSLow));
+  vec4 xyzsHighOff = texture2D(offsetTexture, vec2(extra.x, kOffsetXYZSHigh));
+  vec4 color = texture2D(offsetTexture, vec2(extra.x, kOffsetColor));
+  vec4 rotation =
+      texture2D(offsetTexture, vec2(extra.x, kOffsetRotation)) * 2.0 -
+      vec4(1, 1, 1, 1);
+
+  vec4 xyzsOffset = vec4(xyzsLowOff * 256.0 + xyzsHighOff * 65536.0) / 65535.0 *
+      offsetScale - offsetScale * 0.5;
+
+  mat4 local = world * quatToMatrix(rotation, xyzsOffset.xyz);
+  mat4 worldViewProjection = viewProjection * local;
+
+  v_color = color;
+  v_texCoord = texCoord;
+  v_position = worldViewProjection * position;
+  v_normal = (world * vec4(normal, 0)).xyz;
+  v_surfaceToLight = lightWorldPos - (local * position).xyz;
+  v_surfaceToView = (viewInverse[3] - (local * position)).xyz;
+  gl_Position = v_position;
+}
+
+</script>
+<script id="repeatFragmentShader" type="text/something-not-javascript">
+#ifdef GL_ES
+precision highp float;
+#endif
+uniform vec4 lightColor;
+varying vec4 v_color;
+varying vec4 v_position;
+varying vec2 v_texCoord;
+varying vec3 v_normal;
+varying vec3 v_surfaceToLight;
+varying vec3 v_surfaceToView;
+
+uniform sampler2D diffuseSampler;
+uniform vec4 specular;
+uniform sampler2D bumpSampler;
+uniform float shininess;
+uniform float specularFactor;
+
+vec4 lit(float l ,float h, float m) {
+  return vec4(1.0,
+              max(l, 0.0),
+              (l > 0.0) ? pow(max(0.0, h), m) : 0.0,
+              1.0);
+}
+void main() {
+  //vec4 diffuse = texture2D(diffuseSampler, v_texCoord);
+  vec4 diffuse = v_color;
+  vec3 normal = normalize(v_normal);
+  vec3 surfaceToLight = normalize(v_surfaceToLight);
+  vec3 surfaceToView = normalize(v_surfaceToView);
+  vec3 halfVector = normalize(surfaceToLight + surfaceToView);
+  vec4 litR = lit(dot(normal, surfaceToLight),
+                    dot(normal, halfVector), shininess);
+  gl_FragColor = vec4((
+  lightColor * (diffuse * litR.y
+                        + specular * litR.z * specularFactor)).rgb,
+      diffuse.a);
+}
+</script>
 </html>
 

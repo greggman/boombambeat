@@ -312,6 +312,187 @@ function createLaunchWave(enemyList) {
   return gobj;
 }
 
+/* ---------------------------------------------------------------------------*/
+
+function setupCubeGeo() {
+  var kNumModels = 1000;
+  var kOffsetTextureHeight = 4;
+  var cubeArrays = tdl.primitives.createCube(0.5);
+
+  // Create Shader Program
+  var program = tdl.programs.loadProgramFromScriptTags(
+      'repeatVertexShader',
+      'repeatFragmentShader');
+
+  var arrays = [
+    cubeArrays
+  ];
+
+  var instances = [];
+  for (var ii = 0; ii < kNumModels; ++ii) {
+    instances.push({
+      color: new Float32Array([Math.random(), Math.random(), Math.random()]),
+      arrayIndex: Math.floor(Math.random() * arrays.length)
+    });
+  }
+
+  var offsetTexture = new tdl.textures.ExternalTexture(gl.TEXTURE_2D);
+  offsetTexture.setParameter(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  offsetTexture.setParameter(gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  offsetTexture.setParameter(gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  offsetTexture.setParameter(gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  offsetTexture.setParameter(gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+  // TODO(gman): use floating point textures.
+  var offsetData = new Uint8Array(kNumModels * kOffsetTextureHeight * 4);
+  var offsetStride = kNumModels * 4;
+
+  function PlusMinusOneTo8Bit(value) {
+    if (value < -1 || value > 1) {
+      throw 'value out of range';
+    }
+    return Math.min(255, Math.floor((value * 0.5 + 0.5) * 256));
+  }
+
+  function setOffset(ii, position, color, rotationMatrix) {
+    var off = ii * 4;
+    var x = Math.floor(position[0] * 65535);
+    var y = Math.floor(position[1] * 65535);
+    var z = Math.floor(position[2] * 65535);
+
+    var q = tdl.quaternions.rotationToQuaternion(matrix);
+
+    offsetData[offsetStride * 0 + off + 0] = x & 255;
+    offsetData[offsetStride * 0 + off + 1] = y & 256;
+    offsetData[offsetStride * 0 + off + 2] = z & 256;
+    offsetData[offsetStride * 1 + off + 0] = Math.floor(x / 256);
+    offsetData[offsetStride * 1 + off + 1] = Math.floor(y / 256);
+    offsetData[offsetStride * 1 + off + 2] = Math.floor(z / 256);
+    offsetData[offsetStride * 2 + off + 0] = color[0] * 255;
+    offsetData[offsetStride * 2 + off + 1] = color[1] * 255;
+    offsetData[offsetStride * 2 + off + 2] = color[2] * 255;
+    offsetData[offsetStride * 3 + off + 0] = PlusMinusOneTo8Bit(q[0]);
+    offsetData[offsetStride * 3 + off + 1] = PlusMinusOneTo8Bit(q[1]);
+    offsetData[offsetStride * 3 + off + 2] = PlusMinusOneTo8Bit(q[2]);
+    offsetData[offsetStride * 3 + off + 3] = PlusMinusOneTo8Bit(q[3]);
+  }
+
+  var kPerCircle = 12;
+  var kCircleRadius = 0.3;
+  var kCircleSpacing = 0.1;
+
+  for (var ii = 0; ii < instances.length; ++ii) {
+    var instance = instances[ii];
+    var circle = Math.floor(ii / kPerCircle);
+    var unit = (ii % kPerCircle) / kPerCircle;
+    var position = [
+      (Math.sin(unit * Math.PI * 2) * 0.5 + 0.5) * kCircleRadius,
+      (Math.cos(unit * Math.PI * 2) * 0.5 + 0.5) * kCircleRadius,
+      kCircleSpacing * circle
+    ];
+    var matrix = tdl.math.matrix4.rotationZ(-unit * Math.PI * 2);
+    //tdl.math.matrix4.rotateX(matrix, Math.random() * Math.PI);
+    setOffset(ii,
+       position,
+       instance.color,
+       matrix);
+  }
+
+  offsetTexture.bindToUnit(0);
+  gl.texImage2D(
+      gl.TEXTURE_2D, 0, gl.RGBA, kNumModels, kOffsetTextureHeight,
+      0, gl.RGBA, gl.UNSIGNED_BYTE, offsetData);
+
+  var textures = {
+      diffuseSampler: tdl.textures.loadTexture('assets/google.png'),
+      offsetTexture: offsetTexture
+  };
+
+
+  // Expand arrays from instances to geometry.
+
+  // Step 1: Add an extra colorMult, clockOffset, clockSpeed,
+  //     and radius fields to each geometry
+  for (var ii = 0; ii < arrays.length; ++ii) {
+    var numElements = arrays[ii].position.numElements;
+    arrays[ii].extra = new tdl.primitives.AttribBuffer(4, numElements);
+  }
+
+  // Step 2: convert instances to expanded geometry
+  var arrayInstances = [];
+  for (var ii = 0; ii < instances.length; ++ii) {
+    arrayInstances.push(arrays[instances[ii].arrayIndex]);
+  }
+  var expanded = tdl.primitives.concatLarge(arrayInstances);
+  if (expanded.arrays.length > 1) {
+    throw('too many models or too much geometry');
+  }
+
+  // Step 3: Make models from our expanded geometry.
+  var models = [];
+  for (var ii = 0; ii < expanded.arrays.length; ++ii) {
+    models.push(new tdl.models.Model(program, expanded.arrays[ii], textures));
+  }
+
+  // Step 4: Copy in Colors and other per instance data.
+  for (var ii = 0; ii < instances.length; ++ii) {
+    var instance = instances[ii];
+    var info = expanded.instances[ii];
+    var index = info.arrayIndex;
+    instance.firstVertex = info.firstVertex;
+    instance.numVertices = info.numVertices;
+    instance.expandedArrayIndex = index;
+    var arrays = expanded.arrays[index];
+    var modelNdxOffset = ii / kNumModels + 0.5 / kNumModels;
+    arrays.extra.fillRange(
+        instance.firstVertex, instance.numVertices,
+        [modelNdxOffset, modelNdxOffset, modelNdxOffset, modelNdxOffset]);
+  }
+  for (var ii = 0; ii < models.length; ++ii) {
+    var arrays = expanded.arrays[ii];
+    models[ii].setBuffer('extra', arrays.extra);
+  }
+
+  return models[0];
+}
+
+RepeatedGeometryRenderer = function(name, gameObject, model) {
+  ge.GameComponent.call(this, name, gameObject);
+  this.model = model;
+  gameObject.addPublicProperties({
+    world: new Float32Array(16),
+    lightColor: new Float32Array([1, 1, 1, 1])
+  });
+
+  var geoScale = 10;
+  var pp = gameObject.publicProperties;
+  var world = new Float32Array(16);
+  tdl.fast.matrix4.identity(world);
+  this.per = {
+    world: world,
+    lightColor: new Float32Array([1, 1, 1, 1]),
+    offsetScale: new Float32Array([geoScale, geoScale, geoScale, 1])
+  };
+
+  ge.game.sys['renderer'].addComponent(this);
+}
+
+tdl.base.inherit(RepeatedGeometryRenderer, ge.GameComponent);
+
+RepeatedGeometryRenderer.prototype.draw = function(renderer) {
+  renderer.drawPrep(this.model);
+  renderer.draw(this.model, this.per);
+};
+
+function createRepeatedGeometryRenderer(model) {
+  var gobj = new ge.GameObject();
+  gobj.addComponent(
+      new RepeatedGeometryRenderer("repeatedGeoRenderer", gobj, model));
+  return gobj;
+}
+
+/* ---------------------------------------------------------------------------*/
+
 function initialize() {
   var canvas = document.getElementById("canvas");
   var game = new ge.Game();
@@ -322,6 +503,11 @@ function initialize() {
   game.addSystem("modelManager", new ge.ModelManager());
   game.addSystem(
       "fpsCounter", new ge.FPSCounter(document.getElementById("fps")));
+
+  var model = setupCubeGeo();
+  createRepeatedGeometryRenderer(model);
+
+  return true;
 
   var enemyList = [
     { time:  0, type: createCirclePathEnemy },

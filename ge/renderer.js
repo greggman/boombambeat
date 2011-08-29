@@ -76,6 +76,7 @@ tdl.require('ge.gamesystem');
   // Sphere uniforms.
   var sphereConst = {
     viewInverse: viewInverse,
+    viewProjection: viewProjection,
     lightWorldPos: lightWorldPos,
     specular: one4,
     shininess: 50,
@@ -130,8 +131,9 @@ tdl.require('ge.gamesystem');
     clock += elapsedTime;
 
     var g_eyeSpeed          = 0.5;
-    var g_eyeHeight         = 2;
+    var g_eyeHeight         = 0;
     var g_eyeRadius         = 9;
+    var target = [0, 0, 0];
 
     eyePosition[0] = Math.sin(clock * g_eyeSpeed) * g_eyeRadius;
     eyePosition[1] = g_eyeHeight;
