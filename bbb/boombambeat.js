@@ -1,3 +1,5 @@
+"strict";
+
 tdl.provide('bbb.boombambeat');
 
 bbb.boombambeat = bbb.boombambeat || {};
@@ -314,6 +316,8 @@ function createLaunchWave(enemyList) {
 
 /* ---------------------------------------------------------------------------*/
 
+var kGeoScale = 100;
+
 function setupCubeGeo() {
   var kNumModels = 1000;
   var kOffsetTextureHeight = 4;
@@ -351,20 +355,33 @@ function setupCubeGeo() {
     if (value < -1 || value > 1) {
       throw 'value out of range';
     }
-    return Math.min(255, Math.floor((value * 0.5 + 0.5) * 256));
+    var v = Math.max(0, Math.min(255, Math.floor((value * 0.5 + 0.5) * 256)));
+    //tdl.log(value, v);
+    return v;
+  }
+
+  function scaleToWorld(v) {
+    if (v < -kGeoScale || v > kGeoScale) {
+      throw 'scaleToWorld: value out of range (' + kGeoScale + '): ' + v;
+    }
+    v = v / kGeoScale;
+    return Math.max(0,
+                    Math.min(65535,
+                             Math.floor((v * 0.5 + 0.5) * 65536)));
   }
 
   function setOffset(ii, position, color, rotationMatrix) {
     var off = ii * 4;
-    var x = Math.floor(position[0] * 65535);
-    var y = Math.floor(position[1] * 65535);
-    var z = Math.floor(position[2] * 65535);
+    var x = scaleToWorld(position[0]);
+    var y = scaleToWorld(position[1]);
+    var z = scaleToWorld(position[2]);
 
-    var q = tdl.quaternions.rotationToQuaternion(matrix);
+    var q = tdl.quaternions.rotationToQuaternion(rotationMatrix);
+    //tdl.log(q);
 
     offsetData[offsetStride * 0 + off + 0] = x & 255;
-    offsetData[offsetStride * 0 + off + 1] = y & 256;
-    offsetData[offsetStride * 0 + off + 2] = z & 256;
+    offsetData[offsetStride * 0 + off + 1] = y & 255;
+    offsetData[offsetStride * 0 + off + 2] = z & 255;
     offsetData[offsetStride * 1 + off + 0] = Math.floor(x / 256);
     offsetData[offsetStride * 1 + off + 1] = Math.floor(y / 256);
     offsetData[offsetStride * 1 + off + 2] = Math.floor(z / 256);
@@ -377,20 +394,21 @@ function setupCubeGeo() {
     offsetData[offsetStride * 3 + off + 3] = PlusMinusOneTo8Bit(q[3]);
   }
 
-  var kPerCircle = 12;
-  var kCircleRadius = 0.3;
-  var kCircleSpacing = 0.1;
+  var kPerCircle = 20;
+  var kCircleRadius = 3;
+  var kCircleSpacing = 1.2;
 
   for (var ii = 0; ii < instances.length; ++ii) {
     var instance = instances[ii];
     var circle = Math.floor(ii / kPerCircle);
     var unit = (ii % kPerCircle) / kPerCircle;
     var position = [
-      (Math.sin(unit * Math.PI * 2) * 0.5 + 0.5) * kCircleRadius,
-      (Math.cos(unit * Math.PI * 2) * 0.5 + 0.5) * kCircleRadius,
+      Math.sin(unit * Math.PI * 2) * kCircleRadius,
+      Math.cos(unit * Math.PI * 2) * kCircleRadius,
       kCircleSpacing * circle
     ];
-    var matrix = tdl.math.matrix4.rotationZ(-unit * Math.PI * 2);
+    var matrix = tdl.math.matrix4.rotationZ(unit * Math.PI * 2);
+    //logMat4("mat", matrix);
     //tdl.math.matrix4.rotateX(matrix, Math.random() * Math.PI);
     setOffset(ii,
        position,
@@ -464,14 +482,14 @@ RepeatedGeometryRenderer = function(name, gameObject, model) {
     lightColor: new Float32Array([1, 1, 1, 1])
   });
 
-  var geoScale = 10;
   var pp = gameObject.publicProperties;
   var world = new Float32Array(16);
   tdl.fast.matrix4.identity(world);
   this.per = {
     world: world,
     lightColor: new Float32Array([1, 1, 1, 1]),
-    offsetScale: new Float32Array([geoScale, geoScale, geoScale, 1])
+    offsetScale: new Float32Array(
+        [kGeoScale * 2, kGeoScale * 2, kGeoScale * 2, 1])
   };
 
   ge.game.sys['renderer'].addComponent(this);

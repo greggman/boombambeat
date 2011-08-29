@@ -456,6 +456,43 @@ tdl.quaternions.rotationToQuaternion = function(m) {
   var u;
   var v;
   var w;
+  var q = [];
+
+  //  Calculate the trace of the matrix T from the equation:
+  //
+  //              2     2     2
+  //    T = 4 - 4x  - 4y  - 4z
+  //
+  //               2    2    2
+  //      = 4( 1 -x  - y  - z )
+  //
+  //      = mat[0] + mat[5] + mat[10] + 1
+  //
+
+  var t = m[0] + m[5] + m[10] + 1;
+  if (t > 0) {
+    var r = 0.5 / Math.sqrt(t);
+    q[3] = 0.25 / r;
+    q[0] = (m[2 * 4 + 1] - m[1 * 4 + 2]) * r;
+    q[1] = (m[0 * 4 + 2] - m[2 * 4 + 0]) * r;
+    q[2] = (m[1 * 4 + 0] - m[0 * 4 + 1]) * r;
+    return q;
+  }
+
+
+  //  If the trace of the matrix is greater than zero, then
+  //  perform an "instant" calculation.
+  //
+  //    S = 0.5 / sqrt(T)
+  //
+  //    W = 0.25 / S
+  //
+  //    X = ( mat[9] - mat[6] ) * S
+  //
+  //    Y = ( mat[2] - mat[8] ) * S
+  //
+  //    Z = ( mat[4] - mat[1] ) * S
+  //
 
   // Choose u, v, and w such that u is the index of the biggest diagonal entry
   // of m, and u v w is an even permutation of 0 1 and 2.
@@ -474,7 +511,6 @@ tdl.quaternions.rotationToQuaternion = function(m) {
   }
 
   var r = Math.sqrt(1 + m[u * 4 + u] - m[v * 4 + v] - m[w * 4 + w]);
-  var q = [];
   q[u] = 0.5 * r;
   q[v] = 0.5 * (m[v * 4 + u] + m[u * 4 + v]) / r;
   q[w] = 0.5 * (m[u * 4 + w] + m[w * 4 + u]) / r;
