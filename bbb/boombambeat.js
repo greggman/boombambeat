@@ -78,8 +78,10 @@ CirclePathFollower.prototype.process = function(elapsedTime) {
   this.clock += elapsedTime;
 
   var position = this.position;
-  position[0] = Math.sin(this.clock) * 3;
-  position[1] = Math.cos(this.clock) * 3;
+  var rad = 3; //Math.max(0.5, 3 - this.clock * 2);
+  position[0] = Math.sin(this.clock) * rad;
+  position[1] = Math.cos(this.clock) * rad;
+  position[2] = 0; //this.clock * 10;
 
   var pp = this.gameObject.publicProperties;
   //mat4.scaling(m4t0, [scale, scale, scale]);
@@ -320,6 +322,10 @@ var kGeoScale = 100;
 
 function setupCubeGeo() {
   var kNumModels = 1000;
+  var kPerCircle = 20;
+  var kCircleRadius = 3;
+  var kCircleSpacing = 1.2;
+
   var kOffsetTextureHeight = 4;
   var cubeArrays = tdl.primitives.createCube(0.5);
 
@@ -334,8 +340,13 @@ function setupCubeGeo() {
 
   var instances = [];
   for (var ii = 0; ii < kNumModels; ++ii) {
+    var circle = Math.floor(ii / kPerCircle);
     instances.push({
-      color: new Float32Array([Math.random(), Math.random(), Math.random()]),
+      color: new Float32Array(
+          [(circle % 6) / 5,
+           (circle % 8) / 9,
+           (circle % 3) / 4,
+          ]),
       arrayIndex: Math.floor(Math.random() * arrays.length)
     });
   }
@@ -394,17 +405,14 @@ function setupCubeGeo() {
     offsetData[offsetStride * 3 + off + 3] = PlusMinusOneTo8Bit(q[3]);
   }
 
-  var kPerCircle = 20;
-  var kCircleRadius = 3;
-  var kCircleSpacing = 1.2;
-
+  var kCircleOff = 0.2;
   for (var ii = 0; ii < instances.length; ++ii) {
     var instance = instances[ii];
     var circle = Math.floor(ii / kPerCircle);
     var unit = (ii % kPerCircle) / kPerCircle;
     var position = [
-      Math.sin(unit * Math.PI * 2) * kCircleRadius,
-      Math.cos(unit * Math.PI * 2) * kCircleRadius,
+      Math.sin(unit * Math.PI * 2 + circle * kCircleOff) * kCircleRadius,
+      Math.cos(unit * Math.PI * 2 + circle * kCircleOff) * kCircleRadius,
       kCircleSpacing * circle
     ];
     var matrix = tdl.math.matrix4.rotationZ(unit * Math.PI * 2);
@@ -522,10 +530,8 @@ function initialize() {
   game.addSystem(
       "fpsCounter", new ge.FPSCounter(document.getElementById("fps")));
 
-  var model = setupCubeGeo();
-  createRepeatedGeometryRenderer(model);
-
-  return true;
+//  var model = setupCubeGeo();
+//  createRepeatedGeometryRenderer(model);
 
   var enemyList = [
     { time:  0, type: createCirclePathEnemy },

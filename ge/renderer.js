@@ -28,7 +28,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
+"strict";
 
 /**
  * @fileoverview This file contains the 'Renderer' implemenation.
@@ -135,9 +135,19 @@ tdl.require('ge.gamesystem');
     var g_eyeRadius         = 9;
     var target = [0, 0, 0];
 
+
     eyePosition[0] = Math.sin(clock * g_eyeSpeed) * g_eyeRadius;
     eyePosition[1] = g_eyeHeight;
     eyePosition[2] = Math.cos(clock * g_eyeSpeed) * g_eyeRadius;
+
+    //eyePosition[0] = 0; // Math.sin(clock * g_eyeSpeed) * g_eyeRadius;
+    //eyePosition[1] = 0; //g_eyeHeight;
+    //eyePosition[2] = -1; // Math.cos(clock * g_eyeSpeed) * g_eyeRadius;
+    //var up = [
+    //  Math.sin(clock),
+    //  Math.cos(clock), 0];
+
+
 
     gl.colorMask(true, true, true, true);
     gl.depthMask(true);
