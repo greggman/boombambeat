@@ -73,15 +73,15 @@ tdl.require('ge.gamesystem');
   var clock = 0;
   var lastModel;
 
-  // Sphere uniforms.
-  var sphereConst = {
+  // phong uniforms.
+  var phongConst = {
     viewInverse: viewInverse,
     viewProjection: viewProjection,
     lightWorldPos: lightWorldPos,
     specular: one4,
     shininess: 50,
     specularFactor: 0.2};
-  var spherePer = {
+  var phongPer = {
     lightColor: new Float32Array([1,1,1,1]),
     worldViewProjection: worldViewProjection,
     worldInverse: worldInverse,
@@ -110,7 +110,7 @@ tdl.require('ge.gamesystem');
   ge.Renderer.prototype.drawPrep = function(model) {
     if (model != lastModel) {
       lastModel = model;
-      model.drawPrep(sphereConst);
+      model.drawPrep(phongConst);
     }
   };
 
@@ -122,7 +122,7 @@ tdl.require('ge.gamesystem');
 
   ge.Renderer.prototype.draw = function(model, per) {
     this.computeMatrices(per.world);
-    model.draw(spherePer, per);
+    model.draw(phongPer, per);
   };
 
   ge.Renderer.prototype.process = function(elapsedTime) {
@@ -194,34 +194,6 @@ tdl.require('ge.gamesystem');
         component.draw(this);
       }
     }
-
-  //  Log("--Draw sphere---------------------------------------");
-  //  sphere.drawPrep(sphereConst);
-  //  var model = sphere;
-  //  var across = 3;
-  //  var lightColor = spherePer.lightColor;
-  //  var half = (across - 1) * 0.5;
-  //  for (var xx = 0; xx < across; ++xx) {
-  //    if (xx >= across / 2) {
-  //      model = cube;
-  //      model.drawPrep(sphereConst);
-  //    }
-  //    for (var yy = 0; yy < across; ++yy) {
-  //      for (var zz = 0; zz < across; ++zz) {
-  //        lightColor[0] = xx / across;
-  //        lightColor[1] = yy / across;
-  //        lightColor[2] = zz / across;
-  //        var scale = (xx + yy + zz) % 4 / 4 + 0.5;
-  //        mat4.scaling(m4t0, [scale, scale, scale]);
-  //        mat4.translation(m4t1, [xx - half, yy - half, zz - half]);
-  //        mat4.mul(world, m4t0, m4t1);
-  //        mat4.mul(worldViewProjection, world, viewProjection);
-  //        mat4.inverse(worldInverse, world);
-  //        mat4.transpose(worldInverseTranspose, worldInverse);
-  //        model.draw(spherePer);
-  //      }
-  //    }
-  //  }
 
     // Set the alpha to 255.
     gl.colorMask(false, false, false, true);

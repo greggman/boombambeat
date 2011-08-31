@@ -52,8 +52,8 @@ ge.ModelManager = function() {
     var textures = {
       diffuseSampler: tdl.textures.loadTexture('assets/sometexture.png')};
     var program = tdl.programs.loadProgramFromScriptTags(
-        'sphereVertexShader',
-        'sphereFragmentShader');
+        'phongVertexShader',
+        'phongFragmentShader');
     var arrays = tdl.primitives.createSphere(0.4, 10, 12);
 
     return new tdl.models.Model(program, arrays, textures);
@@ -63,8 +63,8 @@ ge.ModelManager = function() {
     var textures = {
       diffuseSampler: tdl.textures.loadTexture('assets/sometexture.png')};
     var program = tdl.programs.loadProgramFromScriptTags(
-        'sphereVertexShader',
-        'sphereFragmentShader');
+        'phongVertexShader',
+        'phongFragmentShader');
     var arrays = tdl.primitives.createCube(1);
     return new tdl.models.Model(program, arrays, textures);
   }

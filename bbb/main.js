@@ -22,6 +22,8 @@ tdl.require('ge.aimanager');
 tdl.require('ge.inputmanager');
 tdl.require('ge.mousetarget');
 
+tdl.require('bbb.repeatedgeometryrenderer');
+tdl.require('bbb.spirogeometryrenderer');
 tdl.require('bbb.boombambeat');
 
 window.onload = main;
