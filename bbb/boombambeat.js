@@ -109,10 +109,10 @@ CirclePathFollower.prototype.process = function(elapsedTime) {
   this.clock += elapsedTime;
 
   var position = this.position;
-  var rad = 3; //Math.max(0.5, 3 - this.clock * 2);
-  position[0] = Math.sin(this.clock) * rad;
-  position[1] = Math.cos(this.clock) * rad;
-  position[2] = 0; //this.clock * 10;
+  var rad = 1.5; //Math.max(0.5, 3 - this.clock * 2);
+  position[0] = Math.sin(this.clock * 2.8) * rad;
+  position[1] = Math.cos(this.clock * 2.7) * rad;
+  position[2] = this.clock * 10;
 
   var pp = this.gameObject.publicProperties;
   //mat4.scaling(m4t0, [scale, scale, scale]);
