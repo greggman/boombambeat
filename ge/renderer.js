@@ -56,8 +56,8 @@ tdl.require('ge.gamesystem');
   var worldViewProjection = new Float32Array(16);
   var viewInverse = new Float32Array(16);
   var viewProjectionInverse = new Float32Array(16);
-  var eyePosition = new Float32Array(3);
-  var target = new Float32Array(3);
+  var eyePosition = new Float32Array([0, 0, -1]);
+  var target = new Float32Array([0, 0, 0]);
   var up = new Float32Array([0,1,0]);
   var lightWorldPos = new Float32Array(3);
   var v3t0 = new Float32Array(3);
@@ -87,10 +87,12 @@ tdl.require('ge.gamesystem');
     worldInverse: worldInverse,
     worldInverseTranspose: worldInverseTranspose};
 
-
   ge.Renderer = function(canvas) {
     ge.GameSystem.call(this);
     this.canvas = canvas;
+    this.near = 0.1;
+    this.far = 1000;
+    this.fieldOfView = math.degToRad(60);
 
     gl = tdl.webgl.setupWebGL(canvas);
     if (!gl) {
@@ -102,6 +104,25 @@ tdl.require('ge.gamesystem');
   };
 
   tdl.base.inherit(ge.Renderer, ge.GameSystem);
+
+  ge.Renderer.prototype.setNearFar = function(near, far) {
+    this.near = near;
+    this.far = far;
+  };
+
+  ge.Renderer.prototype.setFieldOfView = function(radians) {
+    this.fieldOfView = radians;
+  };
+
+  ge.Renderer.prototype.setLookAt = function(eye, opt_target, opt_up) {
+    eyePosition.set(eye);
+    if (opt_target) {
+      target.set(opt_target);
+    }
+    if (opt_up) {
+      up.set(opt_up);
+    }
+  };
 
   ge.Renderer.prototype.getViewProjectionInverse = function() {
     return viewProjectionInverse;
@@ -128,27 +149,6 @@ tdl.require('ge.gamesystem');
   ge.Renderer.prototype.process = function(elapsedTime) {
 
     lastModel = null;
-    clock += elapsedTime;
-
-    var g_eyeSpeed          = 0.5;
-    var g_eyeHeight         = 0;
-    var g_eyeRadius         = 9;
-    var target = [0, 0, 0];
-
-
-    eyePosition[0] = Math.sin(clock * g_eyeSpeed) * g_eyeRadius;
-    eyePosition[1] = g_eyeHeight;
-    eyePosition[2] = Math.cos(clock * g_eyeSpeed) * g_eyeRadius;
-
-    //eyePosition[0] = 0; // Math.sin(clock * g_eyeSpeed) * g_eyeRadius;
-    //eyePosition[1] = 0; //g_eyeHeight;
-    //eyePosition[2] = -1; // Math.cos(clock * g_eyeSpeed) * g_eyeRadius;
-    //var up = [
-    //  Math.sin(clock),
-    //  Math.cos(clock), 0];
-
-
-
     gl.colorMask(true, true, true, true);
     gl.depthMask(true);
     gl.clearColor(1, 1, 1, 1);
@@ -160,10 +160,10 @@ tdl.require('ge.gamesystem');
 
     mat4.perspective(
         projection,
-        math.degToRad(60),
+        this.fieldOfView,
         this.canvas.clientWidth / this.canvas.clientHeight,
-        1,
-        5000);
+        this.near,
+        this.far);
     mat4.lookAt(
         view,
         eyePosition,

@@ -317,6 +317,35 @@ LaunchWave.prototype.process = function(elapsedTime) {
 
 /* ---------------------------------------------------------------------------*/
 
+/**
+ * Updates the camera.
+ * @param gameObject
+ */
+function CameraController(name, gameObject) {
+  ge.GameComponent.call(this, name, gameObject);
+  ge.game.sys['aiManager'].addComponent(this);
+
+  this.clock = 0;
+  this.eye = new Float32Array([0, 0, -1]);
+  this.target = new Float32Array(3);
+  this.up = new Float32Array([0, 1, 0]);
+  this.renderer = ge.game.sys['renderer'];
+}
+
+tdl.base.inherit(CameraController, ge.GameComponent);
+
+CameraController.prototype.process = function(elapsedTime) {
+  this.clock += elapsedTime;
+
+  var up = this.up;
+  up[0] = Math.sin(this.clock);
+  up[1] = Math.cos(this.clock);
+
+  this.renderer.setLookAt(this.eye, this.target, this.up);
+};
+
+/* ---------------------------------------------------------------------------*/
+
 function createMissile(startPosition, target, time) {
   var gobj = new ge.GameObject();
   var model = ge.game.sys['modelManager'].getModel("sphere");
@@ -347,6 +376,12 @@ function createLaunchWave(enemyList) {
   return gobj;
 }
 
+function createCameraController() {
+  var gobj = new ge.GameObject();
+  gobj.addComponent(new CameraController("camControl", gobj));
+  return gobj;
+}
+
 /* ---------------------------------------------------------------------------*/
 
 function initialize() {
@@ -360,6 +395,7 @@ function initialize() {
   game.addSystem(
       "fpsCounter", new ge.FPSCounter(document.getElementById("fps")));
 
+  createCameraController();
   //createRepeatedGeometryRenderer();
   createSpiroGeometryRenderer();
 

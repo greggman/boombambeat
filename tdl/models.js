@@ -135,6 +135,10 @@ tdl.models.Model.prototype.drawPrep = function() {
   }
 };
 
+tdl.models.Model.prototype.setMode = function(mode) {
+  this.mode = mode;
+};
+
 /**
  * Draws this model.
  *
