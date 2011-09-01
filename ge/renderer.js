@@ -107,10 +107,10 @@ tdl.require('ge.gamesystem');
     return viewProjectionInverse;
   };
 
-  ge.Renderer.prototype.drawPrep = function(model) {
+  ge.Renderer.prototype.drawPrep = function(model, opt_uniforms) {
     if (model != lastModel) {
       lastModel = model;
-      model.drawPrep(phongConst);
+      model.drawPrep(phongConst, opt_uniforms);
     }
   };
 

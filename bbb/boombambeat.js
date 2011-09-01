@@ -41,13 +41,13 @@ var g_logGLCalls = true;  // whether or not to log webgl calls
 var g_debug = false;      // whether or not to debug.
 var g_drawOnce = false;   // draw just one frame.
 
-// Globals
+//g_drawOnce = true;
+//g_debug = true;
+
+// Game Globals
 var g_gameGlobals = {
   numEnemies: 0
 };
-
-//g_drawOnce = true;
-//g_debug = true;
 
 function ValidateNoneOfTheArgsAreUndefined(functionName, args) {
   for (var ii = 0; ii < args.length; ++ii) {
@@ -360,8 +360,8 @@ function initialize() {
   game.addSystem(
       "fpsCounter", new ge.FPSCounter(document.getElementById("fps")));
 
-  createRepeatedGeometryRenderer();
-  //createSpiroGeometryRenderer();
+  //createRepeatedGeometryRenderer();
+  createSpiroGeometryRenderer();
 
   var enemyList = [
     { time:  0, type: createCirclePathEnemy },

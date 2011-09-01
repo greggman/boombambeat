@@ -214,9 +214,9 @@ uniform vec3 lightWorldPos;
 uniform mat4 world;
 uniform mat4 viewInverse;
 
-uniform sampler2d segmentTexture;
+uniform sampler2D segmentTexture;
 uniform float modelsPerSegment;
-uniform vec3 segmentScale;
+uniform vec4 segmentScale;
 uniform float segmentSpacingZ;
 
 attribute vec4 position;
@@ -266,10 +266,11 @@ mat4 quatToMatrix(vec4 orientation, vec3 translation) {
 }
 
 void main() {
-  float modelId   = extra.y;
-  float unitId    = mod(unitId, modelsPerSegment);
-  float segmentId = floor(unitId / modelsPerSegment);
-  float unitPixel = unitId / modelsPerSegment;
+  float halfPixelWidth = 0.5 / modelsPerSegment;
+  float modelId       = extra.y;
+  float segmentUnitId = floor(mod(modelId, modelsPerSegment));
+  float segmentId     = floor(modelId / modelsPerSegment);
+  float unitPixel     = segmentUnitId / modelsPerSegment + halfPixelWidth;
 
   vec4 xyzsLowOff = texture2D(segmentTexture, vec2(unitPixel, kOffsetXYZSLow));
   vec4 xyzsHighOff = texture2D(segmentTexture, vec2(unitPixel, kOffsetXYZSHigh));

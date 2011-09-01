@@ -33,16 +33,16 @@
 "strict";
 
 var kGeoScale = 100;
+var kModelsPerSegment = 20;
 
-var repeatedCubeModel;
+var repeatedCubeModels;
 
 var setupCubeGeo = function() {
   var kNumModels = 1000;
-  var kPerCircle = 20;
   var kCircleRadius = 3;
   var kCircleSpacing = 1.2;
 
-  var kOffsetTextureHeight = 4;
+  var kSegmentTextureHeight = 4;
   var cubeArrays = tdl.primitives.createCube(0.5);
 
   // Create Shader Program
@@ -56,27 +56,28 @@ var setupCubeGeo = function() {
 
   var instances = [];
   for (var ii = 0; ii < kNumModels; ++ii) {
-    var circle = Math.floor(ii / kPerCircle);
+    var circle = Math.floor(ii / kModelsPerSegment);
     instances.push({
       color: new Float32Array(
-          [(circle % 6) / 5,
-           (circle % 8) / 9,
-           (circle % 3) / 4,
+          [Math.random(), //(circle % 6) / 5,
+           Math.random(), //(circle % 8) / 9,
+           Math.random(), //(circle % 3) / 4,
           ]),
       arrayIndex: Math.floor(Math.random() * arrays.length)
     });
   }
 
-  var offsetTexture = new tdl.textures.ExternalTexture(gl.TEXTURE_2D);
-  offsetTexture.setParameter(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  offsetTexture.setParameter(gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  offsetTexture.setParameter(gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  offsetTexture.setParameter(gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  offsetTexture.setParameter(gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  var segmentTexture = new tdl.textures.ExternalTexture(gl.TEXTURE_2D);
+  segmentTexture.setParameter(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  segmentTexture.setParameter(gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  segmentTexture.setParameter(gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  segmentTexture.setParameter(gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  segmentTexture.setParameter(gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
   // TODO(gman): use floating point textures.
-  var offsetData = new Uint8Array(kNumModels * kOffsetTextureHeight * 4);
-  var offsetStride = kNumModels * 4;
+  var offsetData = new Uint8Array(
+      kModelsPerSegment * kSegmentTextureHeight * 4);
+  var offsetStride = kModelsPerSegment * 4;
 
   function PlusMinusOneTo8Bit(value) {
     if (value < -1 || value > 1) {
@@ -122,10 +123,10 @@ var setupCubeGeo = function() {
   }
 
   var kCircleOff = 0.2;
-  for (var ii = 0; ii < instances.length; ++ii) {
+  for (var ii = 0; ii < kModelsPerSegment; ++ii) {
     var instance = instances[ii];
-    var circle = Math.floor(ii / kPerCircle);
-    var unit = (ii % kPerCircle) / kPerCircle;
+    var circle = Math.floor(ii / kModelsPerSegment);
+    var unit = (ii % kModelsPerSegment) / kModelsPerSegment;
     var position = [
       Math.sin(unit * Math.PI * 2 + circle * kCircleOff) * kCircleRadius,
       Math.cos(unit * Math.PI * 2 + circle * kCircleOff) * kCircleRadius,
@@ -140,16 +141,15 @@ var setupCubeGeo = function() {
        matrix);
   }
 
-  offsetTexture.bindToUnit(0);
+  segmentTexture.bindToUnit(0);
   gl.texImage2D(
-      gl.TEXTURE_2D, 0, gl.RGBA, kNumModels, kOffsetTextureHeight,
+      gl.TEXTURE_2D, 0, gl.RGBA, kModelsPerSegment, kSegmentTextureHeight,
       0, gl.RGBA, gl.UNSIGNED_BYTE, offsetData);
 
   var textures = {
       diffuseSampler: tdl.textures.loadTexture('assets/google.png'),
-      offsetTexture: offsetTexture
+      segmentTexture: segmentTexture
   };
-
 
   // Expand arrays from instances to geometry.
 
@@ -195,12 +195,12 @@ var setupCubeGeo = function() {
     models[ii].setBuffer('extra', arrays.extra);
   }
 
-  return models[0];
+  return models;
 }
 
-SpiroGeometryRenderer = function(name, gameObject, model) {
+SpiroGeometryRenderer = function(name, gameObject, models) {
   ge.GameComponent.call(this, name, gameObject);
-  this.model = model;
+  this.models = models;
   gameObject.addPublicProperties({
     world: new Float32Array(16),
     lightColor: new Float32Array([1, 1, 1, 1])
@@ -212,7 +212,9 @@ SpiroGeometryRenderer = function(name, gameObject, model) {
   this.per = {
     world: world,
     lightColor: new Float32Array([1, 1, 1, 1]),
-    offsetScale: new Float32Array(
+    modelsPerSegment: 20,
+    segmentSpacingZ: 1,
+    segmentScale: new Float32Array(
         [kGeoScale * 2, kGeoScale * 2, kGeoScale * 2, 1])
   };
 
@@ -222,19 +224,24 @@ SpiroGeometryRenderer = function(name, gameObject, model) {
 tdl.base.inherit(SpiroGeometryRenderer, ge.GameComponent);
 
 SpiroGeometryRenderer.prototype.draw = function(renderer) {
-  renderer.drawPrep(this.model);
-  renderer.draw(this.model, this.per);
+  var models = this.models;
+  var numModels = models.length;
+  for (var ii = 0; ii < numModels; ++ii) {
+    var model = models[ii];
+    renderer.drawPrep(model);
+    renderer.draw(model, this.per);
+  }
 };
 
 
 createSpiroGeometryRenderer = function() {
-  if (!repeatedCubeModel) {
-    repeatedCubeModel = setupCubeGeo();
+  if (!repeatedCubeModels) {
+    repeatedCubeModels = setupCubeGeo();
   }
 
   var gobj = new ge.GameObject();
   gobj.addComponent(
-      new SpiroGeometryRenderer("spiroGeoRenderer", gobj, repeatedCubeModel));
+      new SpiroGeometryRenderer("spiroGeoRenderer", gobj, repeatedCubeModels));
   return gobj;
 };
 
