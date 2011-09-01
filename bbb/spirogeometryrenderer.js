@@ -210,26 +210,72 @@ SpiroGeometryRenderer = function(name, gameObject, models) {
   var world = new Float32Array(16);
   tdl.fast.matrix4.identity(world);
   this.per = {
+    time: 0,
     world: world,
     lightColor: new Float32Array([1, 1, 1, 1]),
     modelsPerSegment: 20,
-    segmentSpacingZ: 1,
+    segmentSpacingZ: 1.1,
+    segmentMoveScale: new Float32Array([0.44, 0.54]),
+    segmentMovePhase: new Float32Array([0.36, 0.48]),
     segmentScale: new Float32Array(
         [kGeoScale * 2, kGeoScale * 2, kGeoScale * 2, 1])
   };
 
   ge.game.sys['renderer'].addComponent(this);
+
+  var gui = new DAT.GUI({width: 350, height: 400});
+  this.gui = gui;
+  gui.toggle();
+
+  var obj = this.per;
+  this.shadow = {
+    segmentMoveScaleX: obj.segmentMoveScale[0],
+    segmentMoveScaleY: obj.segmentMoveScale[1],
+    segmentMovePhaseX: obj.segmentMovePhase[0],
+    segmentMovePhaseY: obj.segmentMovePhase[1],
+    segmentMoveSpeed: 1,
+    segmentScaleX: obj.segmentScale[0],
+    segmentScaleY: obj.segmentScale[0],
+    segmentScaleZ: obj.segmentScale[0],
+    fieldOfView: 46,
+  };
+  var shd = this.shadow;
+  gui.add(obj, 'segmentSpacingZ').min(0).max(2);
+  gui.add(shd, 'fieldOfView').min(10).max(80);
+  gui.add(shd, 'segmentMoveSpeed').min(0).max(4);
+  gui.add(shd, 'segmentMoveScaleX').min(0).max(2);
+  gui.add(shd, 'segmentMoveScaleY').min(0).max(2);
+  gui.add(shd, 'segmentMovePhaseX').min(0).max(2);
+  gui.add(shd, 'segmentMovePhaseY').min(0).max(2);
+  gui.add(shd, 'segmentScaleX').min(10).max(400);
+  gui.add(shd, 'segmentScaleY').min(10).max(400);
+  gui.add(shd, 'segmentScaleZ').min(10).max(400);
+
+  this.clock = 0;
 }
 
 tdl.base.inherit(SpiroGeometryRenderer, ge.GameComponent);
 
 SpiroGeometryRenderer.prototype.draw = function(renderer) {
+  var per = this.per;
+  var shd = this.shadow;
+  this.clock += 1/60 * shd.segmentMoveSpeed;
+  per.time = this.clock;
+  per.segmentMoveScale[0] = shd.segmentMoveScaleX;
+  per.segmentMoveScale[1] = shd.segmentMoveScaleY;
+  per.segmentMovePhase[0] = shd.segmentMovePhaseX;
+  per.segmentMovePhase[1] = shd.segmentMovePhaseY;
+  per.segmentScale[0] = shd.segmentScaleX;
+  per.segmentScale[1] = shd.segmentScaleY;
+  per.segmentScale[2] = shd.segmentScaleZ;
+  ge.game.sys['renderer'].setFieldOfView(tdl.math.degToRad(shd.fieldOfView));
+
   var models = this.models;
   var numModels = models.length;
   for (var ii = 0; ii < numModels; ++ii) {
     var model = models[ii];
     renderer.drawPrep(model);
-    renderer.draw(model, this.per);
+    renderer.draw(model, per);
   }
 };
 

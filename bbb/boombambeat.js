@@ -303,6 +303,7 @@ LaunchWave.prototype.process = function(elapsedTime) {
   if (this.wait > 0) {
     this.wait -= elapsedTime;
     if (this.wait <= 0) {
+      tdl.log("restart wave");
       this.clock = 0;
       this.index = 0;
     }
@@ -310,6 +311,7 @@ LaunchWave.prototype.process = function(elapsedTime) {
     // restart if there are no enemies and we've added all of these ones.
     if (this.index >= this.enemyList.length &&
         g_gameGlobals.numEnemies == 0) {
+      tdl.log("restart wave in 2 secs");
       this.wait = 2;
     }
   }
