@@ -240,6 +240,7 @@ SpiroGeometryRenderer = function(name, gameObject, models) {
     fieldOfView: 46,
   };
   var shd = this.shadow;
+  //gui.add(obj, 'modelsPerSegment').min(1).max(50).step(1);
   gui.add(obj, 'segmentSpacingZ').min(0).max(2);
   gui.add(shd, 'fieldOfView').min(10).max(80);
   gui.add(shd, 'segmentMoveSpeed').min(0).max(4);
