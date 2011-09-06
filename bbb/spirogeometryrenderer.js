@@ -34,11 +34,12 @@
 
 var kGeoScale = 100;
 var kModelsPerSegment = 20;
+var kNumSegments = 50;
+var kNumModels = kModelsPerSegment * kNumSegments;
 
 var repeatedCubeModels;
 
 var setupCubeGeo = function() {
-  var kNumModels = 1000;
   var kCircleRadius = 3;
   var kCircleSpacing = 1.2;
 
@@ -66,6 +67,22 @@ var setupCubeGeo = function() {
       arrayIndex: Math.floor(Math.random() * arrays.length)
     });
   }
+
+  var colorTexture = new tdl.textures.ExternalTexture(gl.TEXTURE_2D);
+  colorTexture.setParameter(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  colorTexture.setParameter(gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  colorTexture.setParameter(gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  colorTexture.setParameter(gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+  colorTexture.bindToUnit(0);
+  var colorSize = kModelsPerSegment * kNumSegments * 4;
+  var colorData = new Uint8Array(colorSize);
+  for (var ii = 0; ii < colorSize; ++ii) {
+    colorData[ii] = 255;
+  }
+  gl.texImage2D(
+      gl.TEXTURE_2D, 0, gl.RGBA, kModelsPerSegment, kNumSegments,
+      0, gl.RGBA, gl.UNSIGNED_BYTE, colorData);
 
   var segmentTexture = new tdl.textures.ExternalTexture(gl.TEXTURE_2D);
   segmentTexture.setParameter(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -147,7 +164,7 @@ var setupCubeGeo = function() {
       0, gl.RGBA, gl.UNSIGNED_BYTE, offsetData);
 
   var textures = {
-      diffuseSampler: tdl.textures.loadTexture('assets/google.png'),
+      colorSampler: tdl.textures.loadTexture('assets/google.png'),
       segmentTexture: segmentTexture
   };
 
@@ -214,6 +231,7 @@ SpiroGeometryRenderer = function(name, gameObject, models) {
     world: world,
     lightColor: new Float32Array([1, 1, 1, 1]),
     modelsPerSegment: 20,
+    colorOffset: new Float32Array([0, 0]),
     segmentSpacingZ: 1.1,
     segmentMoveScale: new Float32Array([0.44, 0.54]),
     segmentMovePhase: new Float32Array([0.36, 0.48]),

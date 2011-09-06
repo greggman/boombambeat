@@ -222,6 +222,7 @@ uniform vec4 segmentScale;
 uniform float segmentSpacingZ;
 uniform vec2 segmentMoveScale;
 uniform vec2 segmentMovePhase;
+uniform vec2 texCoordOffset;
 
 attribute vec4 position;
 attribute vec3 normal;
@@ -295,7 +296,7 @@ void main() {
   mat4 worldViewProjection = viewProjection * local;
 
   v_color = color;
-  v_texCoord = texCoord;
+  v_texCoord = texCoord + texCoordOffset;
   v_position = worldViewProjection * position;
   v_normal = (world * vec4(normal, 0)).xyz;
   v_surfaceToLight = lightWorldPos - (local * position).xyz;
@@ -316,7 +317,7 @@ varying vec3 v_normal;
 varying vec3 v_surfaceToLight;
 varying vec3 v_surfaceToView;
 
-uniform sampler2D diffuseSampler;
+uniform sampler2D colorSampler;
 uniform vec4 specular;
 uniform sampler2D bumpSampler;
 uniform float shininess;
@@ -329,8 +330,7 @@ vec4 lit(float l ,float h, float m) {
               1.0);
 }
 void main() {
-  //vec4 diffuse = texture2D(diffuseSampler, v_texCoord);
-  vec4 diffuse = v_color;
+  vec4 diffuse = texture2D(colorSampler, v_texCoord) * v_color;
   vec3 normal = normalize(v_normal);
   vec3 surfaceToLight = normalize(v_surfaceToLight);
   vec3 surfaceToView = normalize(v_surfaceToView);
