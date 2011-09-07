@@ -330,7 +330,8 @@ vec4 lit(float l ,float h, float m) {
               1.0);
 }
 void main() {
-  vec4 diffuse = texture2D(colorSampler, v_texCoord) * v_color;
+  vec4 colorMult = texture2D(colorSampler, v_texCoord);
+  vec4 diffuse = v_color;
   vec3 normal = normalize(v_normal);
   vec3 surfaceToLight = normalize(v_surfaceToLight);
   vec3 surfaceToView = normalize(v_surfaceToView);
@@ -340,7 +341,7 @@ void main() {
   gl_FragColor = vec4((
   lightColor * (diffuse * litR.y
                         + specular * litR.z * specularFactor)).rgb,
-      diffuse.a);
+      diffuse.a) + colorMult;
 }
 </script>
 </html>

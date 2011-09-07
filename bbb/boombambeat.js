@@ -397,6 +397,8 @@ function initialize() {
   game.addSystem(
       "fpsCounter", new ge.FPSCounter(document.getElementById("fps")));
 
+  ge.game.sys['renderer'].setBackgroundColor([0, 0, 0, 1]);
+
   createCameraController();
   //createRepeatedGeometryRenderer();
   createSpiroGeometryRenderer();

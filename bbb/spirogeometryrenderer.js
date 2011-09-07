@@ -33,8 +33,9 @@
 "strict";
 
 var kGeoScale = 100;
-var kModelsPerSegment = 20;
-var kNumSegments = 50;
+// these must be power of 2
+var kModelsPerSegment = 16;
+var kNumSegments = 64;
 var kNumModels = kModelsPerSegment * kNumSegments;
 
 var repeatedCubeModels;
@@ -69,16 +70,21 @@ var setupCubeGeo = function() {
   }
 
   var colorTexture = new tdl.textures.ExternalTexture(gl.TEXTURE_2D);
-  colorTexture.setParameter(gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  colorTexture.setParameter(gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   colorTexture.setParameter(gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  colorTexture.setParameter(gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  colorTexture.setParameter(gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
   colorTexture.bindToUnit(0);
   var colorSize = kModelsPerSegment * kNumSegments * 4;
   var colorData = new Uint8Array(colorSize);
-  for (var ii = 0; ii < colorSize; ++ii) {
-    colorData[ii] = 255;
+  for (var yy = 0; yy < kNumSegments; ++yy) {
+    for (var xx = 0; xx < kModelsPerSegment; ++xx) {
+      var color = ((yy % 8) == 0) ? 224 : 0;
+      var ii = (yy * kModelsPerSegment + xx) * 4;
+      colorData[ii + 0] = color;
+      colorData[ii + 1] = color;
+      colorData[ii + 2] = color;
+      colorData[ii + 3] = 255;
+    }
   }
   gl.texImage2D(
       gl.TEXTURE_2D, 0, gl.RGBA, kModelsPerSegment, kNumSegments,
@@ -164,7 +170,7 @@ var setupCubeGeo = function() {
       0, gl.RGBA, gl.UNSIGNED_BYTE, offsetData);
 
   var textures = {
-      colorSampler: tdl.textures.loadTexture('assets/google.png'),
+      colorSampler: colorTexture,
       segmentTexture: segmentTexture
   };
 
@@ -206,10 +212,16 @@ var setupCubeGeo = function() {
     arrays.extra.fillRange(
         instance.firstVertex, instance.numVertices,
         [modelNdxOffset, ii, 0, 0]);
+    var segmentId = Math.floor(ii / kModelsPerSegment);
+    var segmentUnitId = ii % kModelsPerSegment;
+    arrays.texCoord.fillRange(
+      instance.firstVertex, instance.numVertices,
+      [segmentUnitId / kModelsPerSegment, segmentId / kNumSegments]);
   }
   for (var ii = 0; ii < models.length; ++ii) {
     var arrays = expanded.arrays[ii];
     models[ii].setBuffer('extra', arrays.extra);
+    models[ii].setBuffer('texCoord', arrays.texCoord);
   }
 
   return models;
@@ -231,7 +243,7 @@ SpiroGeometryRenderer = function(name, gameObject, models) {
     world: world,
     lightColor: new Float32Array([1, 1, 1, 1]),
     modelsPerSegment: 20,
-    colorOffset: new Float32Array([0, 0]),
+    texCoordOffset: new Float32Array([0, 0]),
     segmentSpacingZ: 1.1,
     segmentMoveScale: new Float32Array([0.44, 0.54]),
     segmentMovePhase: new Float32Array([0.36, 0.48]),
@@ -280,6 +292,7 @@ SpiroGeometryRenderer.prototype.draw = function(renderer) {
   var shd = this.shadow;
   this.clock += 1/60 * shd.segmentMoveSpeed;
   per.time = this.clock;
+  per.texCoordOffset[1] = this.clock * 0.2;
   per.segmentMoveScale[0] = shd.segmentMoveScaleX;
   per.segmentMoveScale[1] = shd.segmentMoveScaleY;
   per.segmentMovePhase[0] = shd.segmentMovePhaseX;

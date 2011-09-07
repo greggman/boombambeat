@@ -93,6 +93,7 @@ tdl.require('ge.gamesystem');
     this.near = 0.1;
     this.far = 1000;
     this.fieldOfView = math.degToRad(60);
+    this.backgroundColor = [1, 1, 1, 1];
 
     gl = tdl.webgl.setupWebGL(canvas);
     if (!gl) {
@@ -141,6 +142,10 @@ tdl.require('ge.gamesystem');
     mat4.transpose(worldInverseTranspose, worldInverse);
   };
 
+  ge.Renderer.prototype.setBackgroundColor = function(color) {
+    this.backgroundColor = color.slice(0, 4);
+  };
+
   ge.Renderer.prototype.draw = function(model, per) {
     this.computeMatrices(per.world);
     model.draw(phongPer, per);
@@ -151,7 +156,11 @@ tdl.require('ge.gamesystem');
     lastModel = null;
     gl.colorMask(true, true, true, true);
     gl.depthMask(true);
-    gl.clearColor(1, 1, 1, 1);
+    gl.clearColor(
+        this.backgroundColor[0],
+        this.backgroundColor[1],
+        this.backgroundColor[2],
+        this.backgroundColor[3]);
     gl.clearDepth(1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 
