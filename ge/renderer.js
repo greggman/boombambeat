@@ -43,6 +43,8 @@ tdl.require('tdl.webgl');
 tdl.require('ge.gamesystem');
 
 (function() {
+  "strict";
+
   var math = tdl.math;
   var fast = tdl.fast;
   var mat4 = fast.matrix4;
